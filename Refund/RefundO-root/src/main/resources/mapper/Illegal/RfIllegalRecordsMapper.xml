@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.refund.root.mapper.RfIllegalRecordsMapper">
+    
+    <resultMap type="RfIllegalRecords" id="RfIllegalRecordsResult">
+        <result property="illegalId"    column="illegal_id"    />
+        <result property="reason"    column="reason"    />
+        <result property="scanTime"    column="scan_time"    />
+        <result property="userId"    column="user_id"    />
+    </resultMap>
+
+    <sql id="selectRfIllegalRecordsVo">
+        select illegal_id, reason, scan_time, user_id from rf_illegal_records
+    </sql>
+
+    <select id="selectRfIllegalRecordsList" parameterType="RfIllegalRecords" resultMap="RfIllegalRecordsResult">
+        <include refid="selectRfIllegalRecordsVo"/>
+        <where>  
+            <if test="scanTime != null "> and scan_time = #{scanTime}</if>
+            <if test="userId != null "> and user_id = #{userId}</if>
+        </where>
+    </select>
+    
+    <select id="selectRfIllegalRecordsByIllegalId" parameterType="Long" resultMap="RfIllegalRecordsResult">
+        <include refid="selectRfIllegalRecordsVo"/>
+        where illegal_id = #{illegalId}
+    </select>
+
+    <insert id="insertRfIllegalRecords" parameterType="RfIllegalRecords" useGeneratedKeys="true" keyProperty="illegalId">
+        insert into rf_illegal_records
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="reason != null">reason,</if>
+            <if test="scanTime != null">scan_time,</if>
+            <if test="userId != null">user_id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="reason != null">#{reason},</if>
+            <if test="scanTime != null">#{scanTime},</if>
+            <if test="userId != null">#{userId},</if>
+         </trim>
+    </insert>
+
+    <update id="updateRfIllegalRecords" parameterType="RfIllegalRecords">
+        update rf_illegal_records
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="reason != null">reason = #{reason},</if>
+            <if test="scanTime != null">scan_time = #{scanTime},</if>
+            <if test="userId != null">user_id = #{userId},</if>
+        </trim>
+        where illegal_id = #{illegalId}
+    </update>
+
+    <delete id="deleteRfIllegalRecordsByIllegalId" parameterType="Long">
+        delete from rf_illegal_records where illegal_id = #{illegalId}
+    </delete>
+
+    <delete id="deleteRfIllegalRecordsByIllegalIds" parameterType="String">
+        delete from rf_illegal_records where illegal_id in 
+        <foreach item="illegalId" collection="array" open="(" separator="," close=")">
+            #{illegalId}
+        </foreach>
+    </delete>
+</mapper>

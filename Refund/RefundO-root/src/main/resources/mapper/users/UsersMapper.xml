@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.refund.root.mapper.RfUsersMapper">
+    
+    <resultMap type="RfUsers" id="UsersResult">
+        <result property="userId"    column="user_id"    />
+        <result property="username"    column="username"    />
+        <result property="balance"    column="balance"    />
+        <result property="userStatus"    column="user_status"    />
+        <result property="phoneNumber"    column="phone_number"    />
+        <result property="email"    column="email"    />
+        <result property="sangke"    column="sangke"    />
+        <result property="wave"    column="wave"    />
+        <result property="password"    column="password"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="bansCount"    column="bans_count"    />
+    </resultMap>
+
+    <sql id="selectUsersVo">
+        select user_id, username, balance, user_status, phone_number, email, sangke, wave, password, create_time, bans_count from rf_users
+    </sql>
+
+    <select id="selectUsersList" parameterType="RfUsers" resultMap="UsersResult">
+        <include refid="selectUsersVo"/>
+        <where>  
+            <if test="username != null  and username != ''"> and username like concat('%', #{username}, '%')</if>
+            <if test="balance != null "> and balance = #{balance}</if>
+            <if test="userStatus != null "> and user_status = #{userStatus}</if>
+            <if test="phoneNumber != null  and phoneNumber != ''"> and phone_number = #{phoneNumber}</if>
+            <if test="bansCount != null "> and bans_count = #{bansCount}</if>
+        </where>
+    </select>
+    
+    <select id="selectUsersByUserId" parameterType="Long" resultMap="UsersResult">
+        <include refid="selectUsersVo"/>
+        where user_id = #{userId}
+    </select>
+
+    <insert id="insertUsers" parameterType="RfUsers" useGeneratedKeys="true" keyProperty="userId">
+        insert into rf_users
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="username != null">username,</if>
+            <if test="balance != null">balance,</if>
+            <if test="userStatus != null">user_status,</if>
+            <if test="phoneNumber != null">phone_number,</if>
+            <if test="email != null">email,</if>
+            <if test="sangke != null">sangke,</if>
+            <if test="wave != null">wave,</if>
+            <if test="password != null">password,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="bansCount != null">bans_count,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="username != null">#{username},</if>
+            <if test="balance != null">#{balance},</if>
+            <if test="userStatus != null">#{userStatus},</if>
+            <if test="phoneNumber != null">#{phoneNumber},</if>
+            <if test="email != null">#{email},</if>
+            <if test="sangke != null">#{sangke},</if>
+            <if test="wave != null">#{wave},</if>
+            <if test="password != null">#{password},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="bansCount != null">#{bansCount},</if>
+         </trim>
+    </insert>
+
+    <update id="updateUsers" parameterType="RfUsers">
+        update rf_users
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="username != null">username = #{username},</if>
+            <if test="balance != null">balance = #{balance},</if>
+            <if test="userStatus != null">user_status = #{userStatus},</if>
+            <if test="phoneNumber != null">phone_number = #{phoneNumber},</if>
+            <if test="email != null">email = #{email},</if>
+            <if test="sangke != null">sangke = #{sangke},</if>
+            <if test="wave != null">wave = #{wave},</if>
+            <if test="password != null">password = #{password},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="bansCount != null">bans_count = #{bansCount},</if>
+        </trim>
+        where user_id = #{userId}
+    </update>
+    <update id="updateUsersStatus" parameterType="map">
+        update rf_users
+        <set>
+            user_status = 
+            <trim prefix="case user_id" suffix="end">
+                <foreach item="userId" collection="userIds" separator=" ">
+                    when #{userId} then #{status}
+                </foreach>
+            </trim>
+            <if test="status == 2">
+                , bans_count = bans_count + 1
+            </if>
+        </set>
+        WHERE user_id IN
+        <foreach item="userId" collection="userIds" open="(" close=")" separator=",">
+            #{userId}
+        </foreach>
+    </update>
+
+    <delete id="deleteUsersByUserId" parameterType="String">
+        delete from rf_users where user_id = #{userId}
+    </delete>
+
+    <delete id="deleteUsersByUserIds" parameterType="String">
+        delete from rf_users where user_id in 
+        <foreach item="userId" collection="array" open="(" separator="," close=")">
+            #{userId}
+        </foreach>
+    </delete>
+</mapper>

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.refund.root.mapper.RefundTransactionsMapper">
+    
+    <resultMap type="RefundTransactions" id="RefundTransactionsResult">
+        <result property="transId"    column="trans_id"    />
+        <result property="requestId"    column="request_id"    />
+        <result property="adminId"    column="admin_id"    />
+        <result property="remittanceReceipt"    column="remittance_receipt"    />
+        <result property="transStatus"    column="trans_status"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="refundNumber"    column="refund_number"    />
+    </resultMap>
+
+    <sql id="selectRefundTransactionsVo">
+        select trans_id, request_id, admin_id, remittance_receipt, trans_status, create_time, update_time, refund_number from refund_transactions
+    </sql>
+
+    <select id="selectRefundTransactionsList" parameterType="RefundTransactions" resultMap="RefundTransactionsResult">
+        <include refid="selectRefundTransactionsVo"/>
+        <where>  
+            <if test="requestId != null "> and request_id = #{requestId}</if>
+            <if test="adminId != null "> and admin_id = #{adminId}</if>
+            <if test="remittanceReceipt != null  and remittanceReceipt != ''"> and remittance_receipt = #{remittanceReceipt}</if>
+            <if test="transStatus != null "> and trans_status = #{transStatus}</if>
+            <if test="refundNumber != null  and refundNumber != ''"> and refund_number = #{refundNumber}</if>
+        </where>
+    </select>
+    
+    <select id="selectRefundTransactionsByTransId" parameterType="Long" resultMap="RefundTransactionsResult">
+        <include refid="selectRefundTransactionsVo"/>
+        where trans_id = #{transId}
+    </select>
+
+    <insert id="insertRefundTransactions" parameterType="RefundTransactions" useGeneratedKeys="true" keyProperty="transId">
+        insert into refund_transactions
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="requestId != null">request_id,</if>
+            <if test="adminId != null">admin_id,</if>
+            <if test="remittanceReceipt != null">remittance_receipt,</if>
+            <if test="transStatus != null">trans_status,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="refundNumber != null and refundNumber != ''">refund_number,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="requestId != null">#{requestId},</if>
+            <if test="adminId != null">#{adminId},</if>
+            <if test="remittanceReceipt != null">#{remittanceReceipt},</if>
+            <if test="transStatus != null">#{transStatus},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="refundNumber != null and refundNumber != ''">#{refundNumber},</if>
+         </trim>
+    </insert>
+    <insert id="addRefundTransactions">
+        insert into refund_transactions (request_id, admin_id, trans_status, create_time, update_time, refund_number)
+        <foreach collection="refundTransactionsList" item="item" open="values " separator=",">
+            (#{item.requestId},#{item.adminId},#{item.transStatus},#{item.createTime},#{item.updateTime},#{item.refundNumber})
+        </foreach>
+    </insert>
+
+    <update id="updateRefundTransactions" parameterType="RefundTransactions">
+        update refund_transactions
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="requestId != null">request_id = #{requestId},</if>
+            <if test="adminId != null">admin_id = #{adminId},</if>
+            <if test="remittanceReceipt != null">remittance_receipt = #{remittanceReceipt},</if>
+            <if test="transStatus != null">trans_status = #{transStatus},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="refundNumber != null and refundNumber != ''">refund_number = #{refundNumber},</if>
+        </trim>
+        where trans_id = #{transId}
+    </update>
+
+    <delete id="deleteRefundTransactionsByTransId" parameterType="Long">
+        delete from refund_transactions where trans_id = #{transId}
+    </delete>
+
+    <delete id="deleteRefundTransactionsByTransIds" parameterType="String">
+        delete from refund_transactions where trans_id in 
+        <foreach item="transId" collection="array" open="(" separator="," close=")">
+            #{transId}
+        </foreach>
+    </delete>
+</mapper>

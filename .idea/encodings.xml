@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/Refund/RefundO-admin/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/Refund/RefundO-admin/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/Refund/RefundO-common/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/Refund/RefundO-common/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/Refund/RefundO-framework/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/Refund/RefundO-framework/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/Refund/RefundO-generator/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/Refund/RefundO-generator/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/Refund/RefundO-quartz/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/Refund/RefundO-quartz/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/Refund/RefundO-root/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/Refund/RefundO-root/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/Refund/RefundO-system/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/Refund/RefundO-system/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/Refund/RefundO-user/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/Refund/RefundO-user/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/Refund/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/Refund/src/main/resources" charset="UTF-8" />
+  </component>
+</project>

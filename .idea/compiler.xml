@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="RefundO-system" />
+        <module name="RefundO-framework" />
+        <module name="RefundO-root" />
+        <module name="refundO" />
+        <module name="RefundO-common" />
+        <module name="RefundO-generator" />
+        <module name="RefundO-quartz" />
+        <module name="RefundO-admin" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="RefundO (com.ruoyi)" target="1.8" />
+    </bytecodeTargetLevel>
+  </component>
+</project>

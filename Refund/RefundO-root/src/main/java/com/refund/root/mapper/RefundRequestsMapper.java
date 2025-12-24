@@ -68,5 +68,5 @@ public interface RefundRequestsMapper
      * @param requestIds 退款申请主键
      * @param status 状态
      * */
-    void updateRefundRequestsStatus(@Param("requestIds") Long[] requestIds, @Param("status") Integer status);
+    int updateRefundRequestsStatus(@Param("requestIds") Long[] requestIds, @Param("status") Integer status,@Param("rejectReason") String rejectReason);
 }

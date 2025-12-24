@@ -101,4 +101,9 @@ public class RefundTransactionsController extends BaseController
     {
         return toAjax(refundTransactionsService.deleteRefundTransactionsByTransIds(transIds));
     }
+
+    /*todo 一、上传交易凭证，上传成功则改变status为1
+       ，二、设置交易单状态为2，接收失败原因，在service层调用requestservice 将请求单状态改为拒绝，将失败原因作为拒绝原因
+       三、在request接口中，当status被设置为2时，将想用户端发送消息、邮箱？短信？app内部通知？
+     */
 }

@@ -110,27 +110,38 @@ public class RefundRequestsServiceImpl implements IRefundRequestsService
      * @return 结果
      */
     @Override
-    public int updateRefundRequestsStatus(Long[] requestIds, Integer status) {
+    public int updateRefundRequestsStatus(Long[] requestIds, Integer status,String rejectReason) {
 
         LoginUser loginUser = SecurityUtils.getLoginUser();
         Long userId = loginUser.getUserId();
-        //先修改请求状态
-        refundRequestsMapper.updateRefundRequestsStatus(requestIds, status);
 
-        //在向交易表中批量插入数据
-        List<RefundTransactions> refundTransactionsList = new ArrayList<>();
-
+        //判断请求状态是否合法
         for(Long requestId : requestIds){
-            RefundTransactions refundTransactions = new RefundTransactions();
-            refundTransactions.setRequestId(requestId);
-            refundTransactions.setAdminId(userId);
-            refundTransactions.setTransStatus(Long.valueOf(0));
-            refundTransactions.setCreateTime(DateUtils.getNowDate());
-            refundTransactions.setUpdateTime(DateUtils.getNowDate());
-            refundTransactionsList.add(refundTransactions);
+            RefundRequests refundRequests = refundRequestsMapper.selectRefundRequestsByRequestId(requestId);
+            if(refundRequests.getRequestStatus() != 0){
+                 return -1;
+            }
         }
 
-        return refundTransactionsMapper.addRefundTransactions(refundTransactionsList);
+        //先修改请求状态
+        int result = refundRequestsMapper.updateRefundRequestsStatus(requestIds, status,rejectReason);
 
+        if(status == 1){
+            //在向交易表中批量插入数据
+            List<RefundTransactions> refundTransactionsList = new ArrayList<>();
+
+            for(Long requestId : requestIds){
+                RefundTransactions refundTransactions = new RefundTransactions();
+                refundTransactions.setRequestId(requestId);
+                refundTransactions.setAdminId(userId);
+                refundTransactions.setTransStatus(Long.valueOf(0));
+                refundTransactions.setCreateTime(DateUtils.getNowDate());
+                refundTransactions.setUpdateTime(DateUtils.getNowDate());
+                refundTransactionsList.add(refundTransactions);
+            }
+
+            return refundTransactionsMapper.addRefundTransactions(refundTransactionsList);
+        }
+        return result;
     }
 }

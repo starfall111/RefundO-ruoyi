@@ -13,10 +13,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="createTime"    column="create_time"    />
         <result property="updateTime"    column="update_time"    />
         <result property="refundNumber"    column="refund_number"    />
+        <result property="paymentMethod"    column="payment_method"    />
+        <result property="paymentNumber"    column="payment_number"    />
+        <result property="amount"    column="amount"    />
     </resultMap>
 
     <sql id="selectRefundTransactionsVo">
-        select trans_id, request_id, admin_id, remittance_receipt, trans_status, create_time, update_time, refund_number from refund_transactions
+        select trans_id, refund_transactions.request_id, refund_transactions.admin_id, remittance_receipt, trans_status, refund_transactions.create_time, refund_transactions.update_time, refund_number, payment_method, payment_number, amount from refund_transactions join refund_requests on refund_transactions.request_id = refund_requests.request_id
     </sql>
 
     <select id="selectRefundTransactionsList" parameterType="RefundTransactions" resultMap="RefundTransactionsResult">
@@ -28,6 +31,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="transStatus != null "> and trans_status = #{transStatus}</if>
             <if test="refundNumber != null  and refundNumber != ''"> and refund_number = #{refundNumber}</if>
         </where>
+        order by refund_transactions.update_time desc
     </select>
     
     <select id="selectRefundTransactionsByTransId" parameterType="Long" resultMap="RefundTransactionsResult">

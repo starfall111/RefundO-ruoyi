@@ -20,7 +20,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectRefundRequestsVo">
-        select request_id, request_status, amount, voucher_url, create_time, update_time, reject_reason, user_id, admin_id, payment_method, payment_number, request_number from refund_requests order by update_time
+        select request_id, request_status, amount, voucher_url, create_time, update_time, reject_reason, user_id, admin_id, payment_method, payment_number, request_number from refund_requests
     </sql>
 
     <select id="selectRefundRequestsList" parameterType="RefundRequests" resultMap="RefundRequestsResult">
@@ -32,8 +32,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="userId != null "> and user_id = #{userId}</if>
             <if test="adminId != null "> and admin_id = #{adminId}</if>
             <if test="paymentMethod != null "> and payment_method = #{paymentMethod}</if>
-            <if test="requestNumber != null  and requestNumber != ''"> and request_number = #{requestNumber}</if>
+            <if test="requestNumber != null  and requestNumber != ''"> and request_number like concat(#{requestNumber},'%')</if>
         </where>
+        order by update_time desc
     </select>
     
     <select id="selectRefundRequestsByRequestId" parameterType="Long" resultMap="RefundRequestsResult">
@@ -90,7 +91,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </update>
     <update id="updateRefundRequestsStatus" parameterType="String">
         update refund_requests
-        set request_status = #{status} ,update_time = now()
+        set request_status = #{status} ,update_time = now(),reject_reason = #{rejectReason}
         where request_id in
         <foreach item="requestId" collection="requestIds" open="(" separator="," close=")">
             #{requestId}

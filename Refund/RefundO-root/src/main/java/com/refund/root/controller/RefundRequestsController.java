@@ -110,8 +110,8 @@ public class RefundRequestsController extends BaseController
     @PreAuthorize("@ss.hasPermi('refund_request:request:status')")
     @Log(title = "退款申请", businessType = BusinessType.UPDATE)
     @PutMapping("/status/{requestIds}/{status}")
-    public AjaxResult approve(@PathVariable("requestIds") Long[] requestIds, @PathVariable("status") Integer status)
+    public AjaxResult approve(@PathVariable("requestIds") Long[] requestIds, @PathVariable("status") Integer status,@RequestBody String reason)
     {
-        return toAjax(refundRequestsService.updateRefundRequestsStatus(requestIds, status));
+        return toAjax(refundRequestsService.updateRefundRequestsStatus(requestIds, status,reason));
     }
 }

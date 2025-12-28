@@ -69,6 +69,20 @@ public class RefundTransactions extends BaseEntity {
     @Excel(name = "金额")
     private BigDecimal amount;
 
+    /**
+     * 拒绝理由
+     */
+    @Excel(name = "拒绝理由")
+    private String rejectReason;
+
+    public String getRejectReason() {
+        return rejectReason;
+    }
+
+    public void setRejectReason(String rejectReason) {
+        this.rejectReason = rejectReason;
+    }
+
     public Integer getPaymentMethod() {
         return paymentMethod;
     }
@@ -155,6 +169,7 @@ public class RefundTransactions extends BaseEntity {
                 .append("paymentMethod", getPaymentMethod())
                 .append("paymentNumber", getPaymentNumber())
                 .append("amount", getAmount())
+                .append("rejectReason", getRejectReason())
                 .toString();
     }
 }

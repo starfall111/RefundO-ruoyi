@@ -16,10 +16,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="paymentMethod"    column="payment_method"    />
         <result property="paymentNumber"    column="payment_number"    />
         <result property="amount"    column="amount"    />
+        <result property="rejectReason"    column="reject_reason"    />
     </resultMap>
 
     <sql id="selectRefundTransactionsVo">
-        select trans_id, refund_transactions.request_id, refund_transactions.admin_id, remittance_receipt, trans_status, refund_transactions.create_time, refund_transactions.update_time, refund_number, payment_method, payment_number, amount from refund_transactions join refund_requests on refund_transactions.request_id = refund_requests.request_id
+        select trans_id, refund_transactions.request_id, refund_transactions.admin_id, remittance_receipt, trans_status, refund_transactions.create_time, refund_transactions.update_time, refund_number, payment_method, payment_number, amount, reject_reason from refund_transactions join refund_requests on refund_transactions.request_id = refund_requests.request_id
     </sql>
 
     <select id="selectRefundTransactionsList" parameterType="RefundTransactions" resultMap="RefundTransactionsResult">
@@ -70,7 +71,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <update id="updateRefundTransactions" parameterType="RefundTransactions">
         update refund_transactions
         <trim prefix="SET" suffixOverrides=",">
-            <if test="requestId != null">request_id = #{requestId},</if>
             <if test="adminId != null">admin_id = #{adminId},</if>
             <if test="remittanceReceipt != null">remittance_receipt = #{remittanceReceipt},</if>
             <if test="transStatus != null">trans_status = #{transStatus},</if>

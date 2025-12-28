@@ -2,6 +2,7 @@ package com.refund.root.service;
 
 import java.util.List;
 import com.refund.root.domain.RefundTransactions;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * 退款交易记录Service接口
@@ -38,10 +39,10 @@ public interface IRefundTransactionsService
     /**
      * 修改退款交易记录
      * 
-     * @param refundTransactions 退款交易记录
+     * @param rejectReason 退款交易记录
      * @return 结果
      */
-    public int updateRefundTransactions(RefundTransactions refundTransactions);
+    public int updateRefundTransactions(Long transId, Long requestStatus,String rejectReason,Long transStatus);
 
     /**
      * 批量删除退款交易记录
@@ -58,4 +59,13 @@ public interface IRefundTransactionsService
      * @return 结果
      */
     public int deleteRefundTransactionsByTransId(Long transId);
+
+    /**
+     * 上传交易凭证
+     * @param transId
+     * @param requestId
+     * @param remittanceReceipt
+     * @return
+     */
+    int upload(@Param("transId") Long transId, @Param("requestId") Long requestId, @Param("remittanceReceipt") String remittanceReceipt);
 }

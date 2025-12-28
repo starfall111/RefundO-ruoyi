@@ -18,10 +18,12 @@
     </properties>
 
     <dependencies>
+        <!-- 通用工具-->
         <dependency>
             <groupId>com.refund</groupId>
             <artifactId>RefundO-framework</artifactId>
         </dependency>
+
     </dependencies>
 
 </project>

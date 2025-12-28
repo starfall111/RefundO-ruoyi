@@ -38,6 +38,11 @@ public class FileUtils
      */
     public static void writeBytes(String filePath, OutputStream os) throws IOException
     {
+        // 如果是OSS URL，直接返回错误，因为OSS文件应该通过URL直接访问
+        if (isOssUrl(filePath)) {
+            throw new IOException("OSS文件不支持直接写入，应通过URL访问");
+        }
+        
         FileInputStream fis = null;
         try
         {
@@ -87,32 +92,25 @@ public class FileUtils
      */
     public static String writeBytes(byte[] data, String uploadDir) throws IOException
     {
+        // 如果使用OSS，则不写入本地文件
+        if (RuoYiConfig.isUseOss()) {
+            throw new IOException("当前使用OSS存储，不支持本地文件写入");
+        }
+        
         FileOutputStream fos = null;
         String pathName = "";
         try
         {
             String extension = getFileExtendName(data);
-            pathName = DateUtils.datePath() + "/" + IdUtils.fastUUID() + "." + extension;
-            File file = FileUploadUtils.getAbsoluteFile(uploadDir, pathName);
-            fos = new FileOutputStream(file);
+            pathName = uploadDir + "/" + IdUtils.fastUUID() + "." + extension;
+            fos = new FileOutputStream(pathName);
             fos.write(data);
         }
         finally
         {
             IOUtils.close(fos);
         }
-        return FileUploadUtils.getPathFileName(uploadDir, pathName);
-    }
-
-    /**
-     * 移除路径中的请求前缀片段
-     * 
-     * @param filePath 文件路径
-     * @return 移除后的文件路径
-     */
-    public static String stripPrefix(String filePath)
-    {
-        return StringUtils.substringAfter(filePath, Constants.RESOURCE_PREFIX);
+        return pathName;
     }
 
     /**
@@ -123,14 +121,18 @@ public class FileUtils
      */
     public static boolean deleteFile(String filePath)
     {
-        boolean flag = false;
-        File file = new File(filePath);
-        // 路径为文件且不为空则进行删除
-        if (file.isFile() && file.exists())
-        {
-            flag = file.delete();
+        // 如果是OSS URL，不执行删除操作，因为OSS文件无法通过此方法删除
+        if (isOssUrl(filePath)) {
+            // OSS文件应该通过OSS API删除，而不是本地删除
+            return false;
         }
-        return flag;
+        
+        if (StringUtils.isEmpty(filePath))
+        {
+            return false;
+        }
+        File del = new File(filePath);
+        return del.exists() && del.delete();
     }
 
     /**
@@ -145,27 +147,25 @@ public class FileUtils
     }
 
     /**
-     * 检查文件是否可下载
+     * 检查文件是否允许下载
      * 
      * @param resource 需要下载的文件
      * @return true 正常 false 非法
      */
     public static boolean checkAllowDownload(String resource)
     {
-        // 禁止目录上跳级别
+        // 如果是OSS URL，允许下载（通过URL访问）
+        if (isOssUrl(resource)) {
+            return true;
+        }
+        
+        // 检查文件路径是否包含".."，防止路径遍历攻击
         if (StringUtils.contains(resource, ".."))
         {
             return false;
         }
 
-        // 检查允许下载的文件规则
-        if (ArrayUtils.contains(MimeTypeUtils.DEFAULT_ALLOWED_EXTENSION, FileTypeUtils.getFileType(resource)))
-        {
-            return true;
-        }
-
-        // 不在允许下载的文件规则
-        return false;
+        return true;
     }
 
     /**
@@ -173,34 +173,20 @@ public class FileUtils
      * 
      * @param request 请求对象
      * @param fileName 文件名
-     * @return 编码后的文件名
+     * @return
      */
     public static String setFileDownloadHeader(HttpServletRequest request, String fileName) throws UnsupportedEncodingException
     {
-        final String agent = request.getHeader("USER-AGENT");
-        String filename = fileName;
-        if (agent.contains("MSIE"))
+        String encodedfileName = null;
+        if (request.getHeader("User-Agent").toUpperCase().contains("MSIE") || request.getHeader("User-Agent").toUpperCase().contains("TRIDENT"))
         {
-            // IE浏览器
-            filename = URLEncoder.encode(filename, "utf-8");
-            filename = filename.replace("+", " ");
-        }
-        else if (agent.contains("Firefox"))
-        {
-            // 火狐浏览器
-            filename = new String(fileName.getBytes(), "ISO8859-1");
-        }
-        else if (agent.contains("Chrome"))
-        {
-            // google浏览器
-            filename = URLEncoder.encode(filename, "utf-8");
+            encodedfileName = URLEncoder.encode(fileName, "UTF-8");
         }
         else
         {
-            // 其它浏览器
-            filename = URLEncoder.encode(filename, "utf-8");
+            encodedfileName = new String(fileName.getBytes("UTF-8"), "ISO8859-1");
         }
-        return filename;
+        return encodedfileName;
     }
 
     /**
@@ -221,46 +207,92 @@ public class FileUtils
                 .append("utf-8''")
                 .append(percentEncodedFileName);
 
-        response.addHeader("Access-Control-Expose-Headers", "Content-Disposition,download-filename");
-        response.setHeader("Content-disposition", contentDispositionValue.toString());
-        response.setHeader("download-filename", percentEncodedFileName);
+        response.setHeader("Content-Disposition", contentDispositionValue.toString());
     }
 
     /**
-     * 百分号编码工具方法
+     * 百分号编码
      *
-     * @param s 需要百分号编码的字符串
-     * @return 百分号编码后的字符串
+     * @param s 需要编码的字符串
+     * @return 编码结果
      */
     public static String percentEncode(String s) throws UnsupportedEncodingException
     {
-        String encode = URLEncoder.encode(s, StandardCharsets.UTF_8.toString());
-        return encode.replaceAll("\\+", "%20");
+        String encode = URLEncoder.encode(s, "UTF-8");
+        // 解决空格被编码为+号的问题
+        encode = encode.replace("+", "%20");
+        encode = encode.replace("*", "%2A");
+        encode = encode.replace("~", "%7E");
+        encode = encode.replace("/", "%2F");
+        return encode;
     }
 
     /**
-     * 获取图像后缀
+     * 获取文件名
      * 
-     * @param photoByte 图像数据
+     * @param filePath 文件路径
+     * @return 文件名
+     */
+    public static final String getName(String filePath)
+    {
+        if (null == filePath)
+        {
+            return null;
+        }
+        int separatorIndex = filePath.lastIndexOf("/");
+        if (separatorIndex < 0)
+        {
+            separatorIndex = filePath.lastIndexOf("\\");
+        }
+        if (separatorIndex < 0)
+        {
+            return filePath;
+        }
+        return StringUtils.substring(filePath, separatorIndex + 1);
+    }
+
+    /**
+     * 获取文件后缀名
+     * 
+     * @param filePath 文件路径
      * @return 后缀名
+     */
+    public static final String getExtension(String filePath)
+    {
+        if (null == filePath)
+        {
+            return null;
+        }
+        int separatorIndex = filePath.lastIndexOf(".");
+        if (separatorIndex < 0)
+        {
+            return "";
+        }
+        return StringUtils.substring(filePath, separatorIndex + 1);
+    }
+
+    /**
+     * 获取文件后缀
+     * 
+     * @param path 文件路径
+     * @return 后缀
      */
     public static String getFileExtendName(byte[] photoByte)
     {
         String strFileExtendName = "jpg";
-        if ((photoByte[0] == 71) && (photoByte[1] == 73) && (photoByte[2] == 70) && (photoByte[3] == 56)
-                && ((photoByte[4] == 55) || (photoByte[4] == 57)) && (photoByte[5] == 97))
+        if (photoByte[0] == 71 && photoByte[1] == 73 && photoByte[2] == 70)
         {
             strFileExtendName = "gif";
         }
-        else if ((photoByte[6] == 74) && (photoByte[7] == 70) && (photoByte[8] == 73) && (photoByte[9] == 70))
+        else if (photoByte[6] == 74 && photoByte[7] == 70 && photoByte[8] == 73 && photoByte[9] == 70)
         {
             strFileExtendName = "jpg";
         }
-        else if ((photoByte[0] == 66) && (photoByte[1] == 77))
+        else if (photoByte[0] == 66 && photoByte[1] == 77)
         {
             strFileExtendName = "bmp";
         }
-        else if ((photoByte[1] == 80) && (photoByte[2] == 78) && (photoByte[3] == 71))
+        else if (photoByte[1] == 80 && photoByte[2] == 78 && photoByte[3] == 71)
         {
             strFileExtendName = "png";
         }
@@ -268,36 +300,68 @@ public class FileUtils
     }
 
     /**
-     * 获取文件名称 /profile/upload/2022/04/16/ruoyi.png -- ruoyi.png
+     * 获取路径
      * 
-     * @param fileName 路径名称
-     * @return 没有文件路径的名称
+     * @param filePath 文件路径
+     * @return 路径
      */
-    public static String getName(String fileName)
+    public static final String getSubPrefix(String filePath)
     {
-        if (fileName == null)
+        if (null == filePath)
         {
             return null;
         }
-        int lastUnixPos = fileName.lastIndexOf('/');
-        int lastWindowsPos = fileName.lastIndexOf('\\');
-        int index = Math.max(lastUnixPos, lastWindowsPos);
-        return fileName.substring(index + 1);
+        int separatorIndex = filePath.lastIndexOf("/");
+        if (separatorIndex < 0)
+        {
+            separatorIndex = filePath.lastIndexOf("\\");
+        }
+        if (separatorIndex < 0)
+        {
+            return "";
+        }
+        return StringUtils.substring(filePath, 0, separatorIndex);
     }
 
     /**
-     * 获取不带后缀文件名称 /profile/upload/2022/04/16/ruoyi.png -- ruoyi
+     * 获取文件相对路径
      * 
-     * @param fileName 路径名称
-     * @return 没有文件路径和后缀的名称
+     * @param path 文件路径
+     * @param remotePath 相对路径
+     * @return 文件相对路径
      */
-    public static String getNameNotSuffix(String fileName)
+    public static String stripPrefix(String path, String remotePath)
     {
-        if (fileName == null)
+        if (StringUtils.isEmpty(path))
         {
-            return null;
+            return path;
         }
-        String baseName = FilenameUtils.getBaseName(fileName);
-        return baseName;
+        if (StringUtils.isEmpty(remotePath))
+        {
+            return StringUtils.substringAfter(path, Constants.RESOURCE_PREFIX);
+        }
+        return StringUtils.substringAfter(path, remotePath + "/");
+    }
+
+    /**
+     * 获取文件相对路径
+     * 
+     * @param path 文件路径
+     * @return 文件相对路径
+     */
+    public static String stripPrefix(String path)
+    {
+        return stripPrefix(path, "");
+    }
+
+    /**
+     * 判断是否为OSS URL
+     * 
+     * @param path 路径
+     * @return 是否为OSS URL
+     */
+    public static boolean isOssUrl(String path)
+    {
+        return StringUtils.isNotEmpty(path) && (path.startsWith("http://") || path.startsWith("https://"));
     }
 }

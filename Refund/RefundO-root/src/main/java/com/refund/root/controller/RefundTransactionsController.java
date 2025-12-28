@@ -1,6 +1,7 @@
 package com.refund.root.controller;
 
 import java.util.List;
+import java.util.Map;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,14 +82,15 @@ public class RefundTransactionsController extends BaseController
     }
 
     /**
-     * 修改退款交易记录
+     * 打回退款交易记录
      */
     @PreAuthorize("@ss.hasPermi('refund_transactions:transactions:edit')")
     @Log(title = "退款交易记录", businessType = BusinessType.UPDATE)
-    @PutMapping
-    public AjaxResult edit(@RequestBody RefundTransactions refundTransactions)
+    @PutMapping("/{transId}/{requestId}")
+    public AjaxResult edit(@PathVariable("transId") Long transId, @PathVariable("requestId") Long requestId, @RequestBody Map<String,String> rejectReason)
     {
-        return toAjax(refundTransactionsService.updateRefundTransactions(refundTransactions));
+        String reason = rejectReason.get("rejectReason");
+        return toAjax(refundTransactionsService.updateRefundTransactions(transId, requestId, reason,5L));
     }
 
     /**
@@ -102,8 +104,15 @@ public class RefundTransactionsController extends BaseController
         return toAjax(refundTransactionsService.deleteRefundTransactionsByTransIds(transIds));
     }
 
-    /*todo 一、上传交易凭证，上传成功则改变status为1
-       ，二、设置交易单状态为2，接收失败原因，在service层调用requestservice 将请求单状态改为拒绝，将失败原因作为拒绝原因
-       三、在request接口中，当status被设置为2时，将想用户端发送消息、邮箱？短信？app内部通知？
-     */
+    /*todo 在request接口中，当status被设置为1,2,4,5时，将想用户端发送消息、邮箱？短信？app内部通知？*/
+
+    @PreAuthorize("@ss.hasPermi('refund_transactions:transactions:upload')")
+    @Log(title = "上传交易凭证", businessType = BusinessType.UPDATE)
+    @PutMapping("/upload/{transId}/{requestId}")
+    public AjaxResult upload(@PathVariable("transId") Long transId, @PathVariable("requestId") Long requestId, @RequestBody Map<String,String> remittanceReceiptMap)
+    {
+        String remittanceReceipt = remittanceReceiptMap.get("remittanceReceipt");
+        return toAjax(refundTransactionsService.upload(transId, requestId, remittanceReceipt));
+    }
+
 }

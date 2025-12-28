@@ -1,6 +1,7 @@
 package com.refund.root.controller;
 
 import java.util.List;
+import java.util.Map;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.ibatis.annotations.Param;
@@ -110,8 +111,9 @@ public class RefundRequestsController extends BaseController
     @PreAuthorize("@ss.hasPermi('refund_request:request:status')")
     @Log(title = "退款申请", businessType = BusinessType.UPDATE)
     @PutMapping("/status/{requestIds}/{status}")
-    public AjaxResult approve(@PathVariable("requestIds") Long[] requestIds, @PathVariable("status") Integer status,@RequestBody String reason)
+    public AjaxResult approve(@PathVariable("requestIds") Long[] requestIds, @PathVariable("status") Long status,@RequestBody Map<String,String> rejectReason)
     {
+        String reason = rejectReason.get("rejectReason");
         return toAjax(refundRequestsService.updateRefundRequestsStatus(requestIds, status,reason));
     }
 }

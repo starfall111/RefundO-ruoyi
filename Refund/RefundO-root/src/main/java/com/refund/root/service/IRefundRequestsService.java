@@ -66,5 +66,5 @@ public interface IRefundRequestsService
      * @param status
      * @return
      */
-    int updateRefundRequestsStatus(@Param("requestIds") Long[] requestIds, @Param("status") Integer status,@Param("reason") String reason);
+    int updateRefundRequestsStatus(@Param("requestIds") Long[] requestIds, @Param("status") Long status,@Param("reason") String reason);
 }

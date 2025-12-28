@@ -7,7 +7,10 @@ import com.refund.common.core.domain.model.LoginUser;
 import com.refund.common.utils.DateUtils;
 import com.refund.common.utils.SecurityUtils;
 import com.refund.root.domain.RefundTransactions;
+import com.refund.root.domain.RfScanRecords;
 import com.refund.root.mapper.RefundTransactionsMapper;
+import com.refund.root.service.IRfScanRecordsService;
+import com.refund.root.utils.numberGenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.refund.root.mapper.RefundRequestsMapper;
@@ -28,6 +31,12 @@ public class RefundRequestsServiceImpl implements IRefundRequestsService
 
     @Autowired
     private RefundTransactionsMapper refundTransactionsMapper;
+
+    @Autowired
+    private IRfScanRecordsService rfScanRecordsService;
+
+    @Autowired
+    private numberGenUtils numberGenUtil;
 
     /**
      * 查询退款申请
@@ -110,16 +119,28 @@ public class RefundRequestsServiceImpl implements IRefundRequestsService
      * @return 结果
      */
     @Override
-    public int updateRefundRequestsStatus(Long[] requestIds, Integer status,String rejectReason) {
+    public int updateRefundRequestsStatus(Long[] requestIds, Long status,String rejectReason) {
 
         LoginUser loginUser = SecurityUtils.getLoginUser();
         Long userId = loginUser.getUserId();
 
         //判断请求状态是否合法
-        for(Long requestId : requestIds){
-            RefundRequests refundRequests = refundRequestsMapper.selectRefundRequestsByRequestId(requestId);
-            if(refundRequests.getRequestStatus() != 0){
-                 return -1;
+        if (status == 1 || status == 2) {
+            for (Long requestId : requestIds) {
+                RefundRequests refundRequests = refundRequestsMapper.selectRefundRequestsByRequestId(requestId);
+                if (refundRequests.getRequestStatus() != 0) {
+                    return -1;
+                }
+            }
+        }
+
+        //当审批拒绝或交易失败时，修改扫描记录状态为0
+        if(status == 2 || status == 5){
+            for(Long requestId : requestIds){
+                RfScanRecords rfScanRecords = new RfScanRecords();
+                rfScanRecords.setScanId(refundRequestsMapper.selectRefundRequestsByRequestId(requestId).getScanId());
+                rfScanRecords.setRefundStatus(0);
+                rfScanRecordsService.updateRfScanRecords(rfScanRecords);
             }
         }
 
@@ -131,13 +152,16 @@ public class RefundRequestsServiceImpl implements IRefundRequestsService
             List<RefundTransactions> refundTransactionsList = new ArrayList<>();
 
             for(Long requestId : requestIds){
+                String refundNumber = numberGenUtil.genTransNumber();
                 RefundTransactions refundTransactions = new RefundTransactions();
                 refundTransactions.setRequestId(requestId);
                 refundTransactions.setAdminId(userId);
                 refundTransactions.setTransStatus(Long.valueOf(0));
                 refundTransactions.setCreateTime(DateUtils.getNowDate());
                 refundTransactions.setUpdateTime(DateUtils.getNowDate());
+                refundTransactions.setRefundNumber(refundNumber);
                 refundTransactionsList.add(refundTransactions);
+
             }
 
             return refundTransactionsMapper.addRefundTransactions(refundTransactionsList);

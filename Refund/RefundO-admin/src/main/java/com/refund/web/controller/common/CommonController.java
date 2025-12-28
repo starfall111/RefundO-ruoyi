@@ -16,8 +16,8 @@ import org.springframework.web.multipart.MultipartFile;
 import com.refund.common.config.RuoYiConfig;
 import com.refund.common.core.domain.AjaxResult;
 import com.refund.common.utils.StringUtils;
-import com.refund.common.utils.file.FileUploadUtils;
 import com.refund.common.utils.file.FileUtils;
+import com.refund.common.utils.file.OssFileUploadService;
 import com.refund.framework.config.ServerConfig;
 
 /**
@@ -34,6 +34,9 @@ public class CommonController
     @Autowired
     private ServerConfig serverConfig;
 
+    @Autowired
+    private OssFileUploadService ossFileUploadService;
+
     private static final String FILE_DELIMETER = ",";
 
     /**
@@ -47,6 +50,20 @@ public class CommonController
     {
         try
         {
+            // 如果使用OSS，则重定向到OSS URL
+            if (RuoYiConfig.isUseOss()) {
+                // OSS中的文件可以通过URL直接访问，无需下载接口
+                // 直接重定向到OSS URL
+                String ossUrl = fileName;
+                if (!ossUrl.startsWith("http://") && !ossUrl.startsWith("https://")) {
+                    // 如果不是完整的URL，构建OSS URL
+                    ossUrl = serverConfig.getUrl() + "/" + fileName;
+                }
+                response.setHeader("Location", ossUrl);
+                response.setStatus(HttpServletResponse.SC_MOVED_TEMPORARILY);
+                return;
+            }
+            
             if (!FileUtils.checkAllowDownload(fileName))
             {
                 throw new Exception(StringUtils.format("文件名称({})非法，不允许下载。 ", fileName));
@@ -76,13 +93,10 @@ public class CommonController
     {
         try
         {
-            // 上传文件路径
-            String filePath = RuoYiConfig.getUploadPath();
-            // 上传并返回新文件名称
-            String fileName = FileUploadUtils.upload(filePath, file);
-            String url = serverConfig.getUrl() + fileName;
+            // 上传到OSS并返回文件URL
+            String fileName = ossFileUploadService.upload(file);
             AjaxResult ajax = AjaxResult.success();
-            ajax.put("url", url);
+            ajax.put("url", fileName);
             ajax.put("fileName", fileName);
             ajax.put("newFileName", FileUtils.getName(fileName));
             ajax.put("originalFilename", file.getOriginalFilename());
@@ -102,18 +116,15 @@ public class CommonController
     {
         try
         {
-            // 上传文件路径
-            String filePath = RuoYiConfig.getUploadPath();
             List<String> urls = new ArrayList<String>();
             List<String> fileNames = new ArrayList<String>();
             List<String> newFileNames = new ArrayList<String>();
             List<String> originalFilenames = new ArrayList<String>();
             for (MultipartFile file : files)
             {
-                // 上传并返回新文件名称
-                String fileName = FileUploadUtils.upload(filePath, file);
-                String url = serverConfig.getUrl() + fileName;
-                urls.add(url);
+                // 上传到OSS并返回文件URL
+                String fileName = ossFileUploadService.upload(file);
+                urls.add(fileName);
                 fileNames.add(fileName);
                 newFileNames.add(FileUtils.getName(fileName));
                 originalFilenames.add(file.getOriginalFilename());
@@ -140,6 +151,18 @@ public class CommonController
     {
         try
         {
+            // 如果使用OSS，则重定向到OSS URL
+            if (RuoYiConfig.isUseOss()) {
+                String ossUrl = resource;
+                if (!ossUrl.startsWith("http://") && !ossUrl.startsWith("https://")) {
+                    // 如果不是完整的URL，构建OSS URL
+                    ossUrl = serverConfig.getUrl() + "/" + resource;
+                }
+                response.setHeader("Location", ossUrl);
+                response.setStatus(HttpServletResponse.SC_MOVED_TEMPORARILY);
+                return;
+            }
+            
             if (!FileUtils.checkAllowDownload(resource))
             {
                 throw new Exception(StringUtils.format("资源文件({})非法，不允许下载。 ", resource));

@@ -66,9 +66,9 @@ public class ImageUtils
         InputStream in = null;
         try
         {
-            if (url.startsWith("http"))
+            if (url.startsWith("http") || url.startsWith("https"))
             {
-                // 网络地址
+                // 网络地址（包括OSS地址）
                 URL urlObj = new URL(url);
                 URLConnection urlConnection = urlObj.openConnection();
                 urlConnection.setConnectTimeout(30 * 1000);

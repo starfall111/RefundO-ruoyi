@@ -29,6 +29,9 @@ public class RuoYiConfig
 
     /** 验证码类型 */
     private static String captchaType;
+    
+    /** 是否使用OSS存储 */
+    private static boolean useOss = false;
 
     public String getName()
     {
@@ -88,11 +91,22 @@ public class RuoYiConfig
         RuoYiConfig.captchaType = captchaType;
     }
 
+    public static boolean isUseOss() {
+        return useOss;
+    }
+
+    public void setUseOss(boolean useOss) {
+        RuoYiConfig.useOss = useOss;
+    }
+
     /**
      * 获取导入上传路径
      */
     public static String getImportPath()
     {
+        if (useOss) {
+            return "/oss/import";
+        }
         return getProfile() + "/import";
     }
 
@@ -101,6 +115,9 @@ public class RuoYiConfig
      */
     public static String getAvatarPath()
     {
+        if (useOss) {
+            return "/oss/avatar";
+        }
         return getProfile() + "/avatar";
     }
 
@@ -109,6 +126,9 @@ public class RuoYiConfig
      */
     public static String getDownloadPath()
     {
+        if (useOss) {
+            return "/oss/download/";
+        }
         return getProfile() + "/download/";
     }
 
@@ -117,6 +137,9 @@ public class RuoYiConfig
      */
     public static String getUploadPath()
     {
+        if (useOss) {
+            return "/oss/upload";
+        }
         return getProfile() + "/upload";
     }
 }

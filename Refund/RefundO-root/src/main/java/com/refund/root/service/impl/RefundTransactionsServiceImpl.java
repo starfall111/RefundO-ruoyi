@@ -1,7 +1,11 @@
 package com.refund.root.service.impl;
 
 import java.util.List;
+
+import com.refund.common.core.domain.model.LoginUser;
 import com.refund.common.utils.DateUtils;
+import com.refund.common.utils.SecurityUtils;
+import com.refund.root.service.IRefundRequestsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.refund.root.mapper.RefundTransactionsMapper;
@@ -19,6 +23,9 @@ public class RefundTransactionsServiceImpl implements IRefundTransactionsService
 {
     @Autowired
     private RefundTransactionsMapper refundTransactionsMapper;
+
+    @Autowired
+    private IRefundRequestsService refundRequestsService;
 
     /**
      * 查询退款交易记录
@@ -60,12 +67,20 @@ public class RefundTransactionsServiceImpl implements IRefundTransactionsService
     /**
      * 修改退款交易记录
      * 
-     * @param refundTransactions 退款交易记录
+     * @param rejectReason 退款交易记录
      * @return 结果
      */
     @Override
-    public int updateRefundTransactions(RefundTransactions refundTransactions)
+    public int updateRefundTransactions(Long transId, Long requestId,String rejectReason,Long requestStatus)
     {
+        RefundTransactions refundTransactions = new RefundTransactions();
+        Long[] requestIds = new Long[]{requestId};
+        refundRequestsService.updateRefundRequestsStatus(requestIds, requestStatus,rejectReason);
+        LoginUser loginUser = SecurityUtils.getLoginUser();
+        Long userId = loginUser.getUserId();
+        refundTransactions.setAdminId(userId);
+        refundTransactions.setTransId(transId);
+        refundTransactions.setTransStatus(2L);
         refundTransactions.setUpdateTime(DateUtils.getNowDate());
         return refundTransactionsMapper.updateRefundTransactions(refundTransactions);
     }
@@ -92,5 +107,26 @@ public class RefundTransactionsServiceImpl implements IRefundTransactionsService
     public int deleteRefundTransactionsByTransId(Long transId)
     {
         return refundTransactionsMapper.deleteRefundTransactionsByTransId(transId);
+    }
+
+    /**
+     * 上传交易凭证
+     * @param transId
+     * @param requestId
+     * @param remittanceReceipt
+     * @return
+     */
+    @Override
+    public int upload(Long transId, Long requestId, String remittanceReceipt) {
+        RefundTransactions refundTransactions = new RefundTransactions();
+        LoginUser loginUser = SecurityUtils.getLoginUser();
+        Long[] requestIds = new Long[]{requestId};
+        refundRequestsService.updateRefundRequestsStatus(requestIds, 4L,"");
+        refundTransactions.setTransId(transId);
+        refundTransactions.setAdminId(loginUser.getUserId());
+        refundTransactions.setRemittanceReceipt(remittanceReceipt);
+        refundTransactions.setTransStatus(1L);
+        refundTransactions.setUpdateTime(DateUtils.getNowDate());
+        return refundTransactionsMapper.updateRefundTransactions(refundTransactions);
     }
 }

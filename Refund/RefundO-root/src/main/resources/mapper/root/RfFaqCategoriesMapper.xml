@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.refund.root.mapper.RfFaqCategoriesMapper">
+    
+    <resultMap type="RfFaqCategories" id="RfFaqCategoriesResult">
+        <result property="id"    column="id"    />
+        <result property="categoryName"    column="category_name"    />
+        <result property="categoryDescription"    column="category_description"    />
+        <result property="parentId"    column="parent_id"    />
+        <result property="sortOrder"    column="sort_order"    />
+        <result property="status"    column="status"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectRfFaqCategoriesVo">
+        select id, category_name, category_description, parent_id, sort_order, status, create_time, update_time from rf_faq_categories
+    </sql>
+
+    <select id="selectRfFaqCategoriesList" parameterType="RfFaqCategories" resultMap="RfFaqCategoriesResult">
+        <include refid="selectRfFaqCategoriesVo"/>
+        <where>  
+            <if test="categoryName != null  and categoryName != ''"> and category_name like concat('%', #{categoryName}, '%')</if>
+            <if test="status != null "> and status = #{status}</if>
+            <if test="params.beginUpdateTime != null and params.beginUpdateTime != '' and params.endUpdateTime != null and params.endUpdateTime != ''"> and update_time between #{params.beginUpdateTime} and #{params.endUpdateTime}</if>
+        </where>
+    </select>
+    
+    <select id="selectRfFaqCategoriesById" parameterType="Long" resultMap="RfFaqCategoriesResult">
+        <include refid="selectRfFaqCategoriesVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertRfFaqCategories" parameterType="RfFaqCategories" useGeneratedKeys="true" keyProperty="id">
+        insert into rf_faq_categories
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="categoryName != null and categoryName != ''">category_name,</if>
+            <if test="categoryDescription != null">category_description,</if>
+            <if test="parentId != null">parent_id,</if>
+            <if test="sortOrder != null">sort_order,</if>
+            <if test="status != null">status,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="categoryName != null and categoryName != ''">#{categoryName},</if>
+            <if test="categoryDescription != null">#{categoryDescription},</if>
+            <if test="parentId != null">#{parentId},</if>
+            <if test="sortOrder != null">#{sortOrder},</if>
+            <if test="status != null">#{status},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateRfFaqCategories" parameterType="RfFaqCategories">
+        update rf_faq_categories
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="categoryName != null and categoryName != ''">category_name = #{categoryName},</if>
+            <if test="categoryDescription != null">category_description = #{categoryDescription},</if>
+            <if test="parentId != null">parent_id = #{parentId},</if>
+            <if test="sortOrder != null">sort_order = #{sortOrder},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteRfFaqCategoriesById" parameterType="Long">
+        delete from rf_faq_categories where id = #{id}
+    </delete>
+
+    <delete id="deleteRfFaqCategoriesByIds" parameterType="String">
+        delete from rf_faq_categories where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

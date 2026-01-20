@@ -17,7 +17,7 @@
         <result property="paymentMethod" column="payment_method"/>
         <result property="paymentNumber" column="payment_number"/>
         <result property="requestNumber" column="request_number"/>
-        <result property="scanId" column="scan_id"/>
+        <result property="scanIds" column="scan_ids"/>
     </resultMap>
 
     <sql id="selectRefundRequestsVo">
@@ -33,7 +33,7 @@
                payment_method,
                payment_number,
                request_number,
-               scan_id
+               scan_ids
 
         from refund_requests
     </sql>
@@ -50,7 +50,7 @@
             <if test="requestNumber != null  and requestNumber != ''">and request_number like
                 concat(#{requestNumber},'%')
             </if>
-            <if test="scanId != null">and scan_id =  #{scanId} </if>
+            <if test="scanId != null">and scan_ids like concat(#{scanIds},'%') </if>
         </where>
         order by update_time desc
     </select>
@@ -109,7 +109,7 @@
     </update>
     <update id="updateRefundRequestsStatus" parameterType="String">
         update refund_requests
-        set request_status = #{status} ,update_time = now(),reject_reason = #{rejectReason}
+        set request_status = #{status} ,update_time = now(),reject_reason = #{rejectReason},admin_id = #{adminId}
         where request_id in
         <foreach item="requestId" collection="requestIds" open="(" separator="," close=")">
             #{requestId}

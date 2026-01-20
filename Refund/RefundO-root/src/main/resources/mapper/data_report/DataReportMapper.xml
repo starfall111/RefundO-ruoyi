@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.refund.root.mapper.DataReportMapper">
+    
+    <!-- 查询活跃用户数 - 连续3天都有扫码记录或退款申请记录 -->
+    <select id="userActionCount" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM (
+            SELECT t1.user_id
+            FROM (
+                -- 获取有扫码记录的用户及日期
+                SELECT DISTINCT user_id, DATE(scan_time) AS activity_date
+                FROM rf_scan_records
+                WHERE scan_time >= DATE_SUB(CURDATE(), INTERVAL 2 DAY)
+                  AND   DATE_ADD(CURDATE(), INTERVAL 1 DAY) > scan_time
+                
+                UNION
+                
+                -- 获取有退款申请记录的用户及日期
+                SELECT DISTINCT user_id, DATE(create_time) AS activity_date
+                FROM refund_requests
+                WHERE create_time >= DATE_SUB(CURDATE(), INTERVAL 2 DAY)
+                  AND  DATE_ADD(CURDATE(), INTERVAL 1 DAY) > create_time
+            ) t1
+            GROUP BY t1.user_id
+            HAVING COUNT(DISTINCT t1.activity_date) >= 3
+        ) t2
+    </select>
+
+    <!-- 获取最近几天有活动记录的用户ID -->
+    <select id="getUserIdsWithActivityInDays" resultType="java.lang.Long">
+        SELECT DISTINCT user_id
+        FROM (
+            -- 获取有扫码记录的用户
+            SELECT DISTINCT user_id
+            FROM rf_scan_records
+            WHERE scan_time >= DATE_SUB(CURDATE(), INTERVAL #{days} - 1 DAY)
+              AND DATE_ADD(CURDATE(), INTERVAL 1 DAY) > scan_time
+            
+            UNION
+            
+            -- 获取有退款申请记录的用户
+            SELECT DISTINCT user_id
+            FROM refund_requests
+            WHERE create_time >= DATE_SUB(CURDATE(), INTERVAL #{days} - 1 DAY)
+              AND DATE_ADD(CURDATE(), INTERVAL 1 DAY) > create_time
+        ) t
+    </select>
+
+    <!-- 获取连续指定天数都有活动记录的用户数量 -->
+    <select id="getContinuousActiveUsersCount" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM (
+            SELECT t1.user_id
+            FROM (
+                -- 获取有扫码记录的用户及日期
+                SELECT DISTINCT user_id, DATE(scan_time) AS activity_date
+                FROM rf_scan_records
+                WHERE scan_time >= DATE_SUB(CURDATE(), INTERVAL #{days} - 1 DAY)
+                  AND DATE_ADD(CURDATE(), INTERVAL 1 DAY) > scan_time
+                
+                UNION
+                
+                -- 获取有退款申请记录的用户及日期
+                SELECT DISTINCT user_id, DATE(create_time) AS activity_date
+                FROM refund_requests
+                WHERE create_time >= DATE_SUB(CURDATE(), INTERVAL #{days} - 1 DAY)
+                  AND DATE_ADD(CURDATE(), INTERVAL 1 DAY) > create_time
+            ) t1
+            GROUP BY t1.user_id
+            HAVING COUNT(DISTINCT t1.activity_date) >= #{days}
+        ) t2
+    </select>
+
+    <!-- 查询注册用户总数 -->
+    <select id="userCount" resultType="java.lang.Integer">
+        SELECT COUNT(0)
+        FROM rf_users
+    </select>
+
+    <!-- 查询扫码次数 -->
+    <select id="scanCount" resultType="java.lang.Integer">
+        SELECT COUNT(0)
+        FROM rf_scan_records
+    </select>
+    
+    <!-- 获取总退款申请数 -->
+    <select id="getTotalRefundRequestsCount" resultType="java.lang.Integer">
+        SELECT COUNT(0)
+        FROM refund_requests
+    </select>
+    
+<!--    获取状态为4的退款申请-->
+    <select id="getTotalApprovedCount" resultType="integer">
+        SELECT count(0)
+        FROM refund_requests
+        WHERE request_status = 4
+    </select>
+    
+    <!-- 获取平均审批时间（单位：小时） -->
+    <select id="getAverageApprovalTime" resultType="java.lang.Double">
+        SELECT 
+            CASE 
+                WHEN COUNT(*) = 0 THEN 0
+                ELSE COALESCE(
+                    ROUND(AVG(TIMESTAMPDIFF(HOUR, create_time, update_time)), 2),
+                    0
+                )
+            END AS avgApprovalTime
+        FROM refund_requests
+        WHERE request_status = 4-- 已批准的申请
+          AND create_time IS NOT NULL
+          AND update_time IS NOT NULL
+    </select>
+    
+    <!-- 获取高频用户（7天内退款申请数超过阈值的用户） -->
+    <select id="getHighFrequencyUsers" resultType="com.refund.root.domain.RfUsers">
+        SELECT u.user_id, u.username, u.balance, u.user_status, u.phone_number, u.email, u.sangke, u.wave, u.password, u.create_time, u.bans_count
+        FROM rf_users u
+        INNER JOIN (
+            SELECT user_id, COUNT(*) as request_count
+            FROM refund_requests
+            WHERE create_time >= DATE_SUB(CURDATE(), INTERVAL #{days} DAY)
+            GROUP BY user_id
+            HAVING COUNT(*) > #{threshold}
+        ) r ON u.user_id = r.user_id
+        ORDER BY r.request_count DESC
+    </select>
+    
+    <!-- 获取总余额 -->
+    <select id="getTotalBalance" resultType="java.math.BigDecimal">
+        SELECT COALESCE(SUM(balance), 0)
+        FROM rf_users
+    </select>
+    
+    <!-- 获取平均用户余额 -->
+    <select id="getAverageBalance" resultType="java.math.BigDecimal">
+        SELECT COALESCE(AVG(balance), 0)
+        FROM rf_users
+    </select>
+
+    <select id="getRefundRequestCount" resultType="Integer">
+        SELECT COUNT(0)
+        FROM refund_requests
+        where create_time >= #{begin}
+        and #{end} >= create_time
+    </select>
+
+    <select id="getScanCount" resultType="Integer">
+        SELECT COUNT(0)
+        FROM rf_scan_records
+        where scan_time >= #{begin}
+        and #{end} >= scan_time
+    </select>
+
+    <select id="getBalanceGroupStats" resultType="java.util.HashMap">
+        SELECT
+        COALESCE(COUNT(CASE WHEN balance BETWEEN 0 AND 10000 THEN 1 END), 0) as balance_first_ratio,
+        COALESCE(COUNT(CASE WHEN balance > 10000 AND 20000 >=  balance THEN 1 END), 0) as balance_second_ratio,
+        COALESCE(COUNT(CASE WHEN balance > 20000 AND 50000 >= balance THEN 1 END), 0) as balance_third_ratio,
+        COALESCE(COUNT(CASE WHEN balance > 50000 AND 100000 >= balance THEN 1 END), 0) as balance_fourth_ratio,
+        COALESCE(COUNT(CASE WHEN balance > 100000 THEN 1 END), 0) as balance_fifth_ratio
+        from rf_users
+    </select>
+</mapper>

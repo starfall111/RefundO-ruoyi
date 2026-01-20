@@ -118,6 +118,7 @@ public class RefundRequestsServiceImpl implements IRefundRequestsService
      * @param status 状态
      * @return 结果
      */
+//    TODO 在添加退款交易记录时，先检查表中是否已经存在requestId相同的记录，如果存在则不添加，如果不存在则添加
     @Override
     public int updateRefundRequestsStatus(Long[] requestIds, Long status,String rejectReason) {
 
@@ -138,14 +139,22 @@ public class RefundRequestsServiceImpl implements IRefundRequestsService
         if(status == 2 || status == 5){
             for(Long requestId : requestIds){
                 RfScanRecords rfScanRecords = new RfScanRecords();
-                rfScanRecords.setScanId(refundRequestsMapper.selectRefundRequestsByRequestId(requestId).getScanId());
-                rfScanRecords.setRefundStatus(0);
-                rfScanRecordsService.updateRfScanRecords(rfScanRecords);
+                String ScanIds = refundRequestsMapper.selectRefundRequestsByRequestId(requestId).getScanId();
+                String[] ScanIdArray = ScanIds.split(",");
+//                将扫描记录ID转为Long类型
+                Long[] scanIdArray = new Long[ScanIdArray.length];
+                for(int i = 0; i < ScanIdArray.length; i++){
+                    scanIdArray[i] = Long.parseLong(ScanIdArray[i]);
+                    rfScanRecords.setScanId(scanIdArray[i]);
+                    rfScanRecords.setRefundStatus(0);
+                    rfScanRecordsService.updateRfScanRecords(rfScanRecords);
+                }
             }
         }
 
+
         //先修改请求状态
-        int result = refundRequestsMapper.updateRefundRequestsStatus(requestIds, status,rejectReason);
+        int result = refundRequestsMapper.updateRefundRequestsStatus(requestIds, status,rejectReason,userId);
 
         if(status == 1){
             //在向交易表中批量插入数据

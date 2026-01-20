@@ -76,14 +76,14 @@ public class RefundRequests extends BaseEntity {
      * 扫描ID
      */
     @Excel(name = "扫描ID")
-    private Long scanId;
+    private String scanIds;
 
-    public Long getScanId() {
-        return scanId;
+    public String getScanId() {
+        return scanIds;
     }
 
-    public void setScanId(Long scanId) {
-        this.scanId = scanId;
+    public void setScanId(String scanIds) {
+        this.scanIds = scanIds;
     }
 
     public void setRequestId(Long requestId) {

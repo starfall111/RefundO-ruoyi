@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.refund.root.mapper.RfAppVersionMapper">
+    
+    <resultMap type="RfAppVersion" id="RfAppVersionResult">
+        <result property="versionId"    column="version_id"    />
+        <result property="updateStatus"    column="update_status"    />
+        <result property="versionCode"    column="version_code"    />
+        <result property="versionName"    column="version_name"    />
+        <result property="modifyContent"    column="modify_content"    />
+        <result property="downloadUrl"    column="download_url"    />
+        <result property="apkSize"    column="apk_size"    />
+        <result property="apkMd5"    column="apk_md5"    />
+    </resultMap>
+
+    <sql id="selectRfAppVersionVo">
+        select version_id, update_status, version_code, version_name, modify_content, download_url, apk_size, apk_md5 from rf_app_version
+    </sql>
+
+    <select id="selectRfAppVersionList" parameterType="RfAppVersion" resultMap="RfAppVersionResult">
+        <include refid="selectRfAppVersionVo"/>
+        <where>  
+            <if test="versionId != null "> and version_id = #{versionId}</if>
+            <if test="updateStatus != null "> and update_status = #{updateStatus}</if>
+            <if test="versionCode != null "> and version_code = #{versionCode}</if>
+            <if test="versionName != null  and versionName != ''"> and version_name like concat('%', #{versionName}, '%')</if>
+            <if test="modifyContent != null  and modifyContent != ''"> and modify_content like concat('%', #{modifyContent}, '%')</if>
+            <if test="downloadUrl != null  and downloadUrl != ''"> and download_url = #{downloadUrl}</if>
+            <if test="apkSize != null "> and apk_size = #{apkSize}</if>
+        </where>
+    </select>
+    
+    <select id="selectRfAppVersionByVersionId" parameterType="Long" resultMap="RfAppVersionResult">
+        <include refid="selectRfAppVersionVo"/>
+        where version_id = #{versionId}
+    </select>
+
+    <insert id="insertRfAppVersion" parameterType="RfAppVersion" useGeneratedKeys="true" keyProperty="versionId">
+        insert into rf_app_version
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="updateStatus != null">update_status,</if>
+            <if test="versionCode != null">version_code,</if>
+            <if test="versionName != null and versionName != ''">version_name,</if>
+            <if test="modifyContent != null and modifyContent != ''">modify_content,</if>
+            <if test="downloadUrl != null and downloadUrl != ''">download_url,</if>
+            <if test="apkSize != null">apk_size,</if>
+            <if test="apkMd5 != null">apk_md5,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="updateStatus != null">#{updateStatus},</if>
+            <if test="versionCode != null">#{versionCode},</if>
+            <if test="versionName != null and versionName != ''">#{versionName},</if>
+            <if test="modifyContent != null and modifyContent != ''">#{modifyContent},</if>
+            <if test="downloadUrl != null and downloadUrl != ''">#{downloadUrl},</if>
+            <if test="apkSize != null">#{apkSize},</if>
+            <if test="apkMd5 != null">#{apkMd5},</if>
+         </trim>
+    </insert>
+
+    <update id="updateRfAppVersion" parameterType="RfAppVersion">
+        update rf_app_version
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="updateStatus != null">update_status = #{updateStatus},</if>
+            <if test="versionCode != null">version_code = #{versionCode},</if>
+            <if test="versionName != null and versionName != ''">version_name = #{versionName},</if>
+            <if test="modifyContent != null and modifyContent != ''">modify_content = #{modifyContent},</if>
+            <if test="downloadUrl != null and downloadUrl != ''">download_url = #{downloadUrl},</if>
+            <if test="apkSize != null">apk_size = #{apkSize},</if>
+            <if test="apkMd5 != null">apk_md5 = #{apkMd5},</if>
+        </trim>
+        where version_id = #{versionId}
+    </update>
+
+    <delete id="deleteRfAppVersionByVersionId" parameterType="Long">
+        delete from rf_app_version where version_id = #{versionId}
+    </delete>
+
+    <delete id="deleteRfAppVersionByVersionIds" parameterType="String">
+        delete from rf_app_version where version_id in 
+        <foreach item="versionId" collection="array" open="(" separator="," close=")">
+            #{versionId}
+        </foreach>
+    </delete>
+</mapper>

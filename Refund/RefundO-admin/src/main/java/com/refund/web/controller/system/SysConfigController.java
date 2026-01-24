@@ -18,6 +18,7 @@ import com.refund.common.core.controller.BaseController;
 import com.refund.common.core.domain.AjaxResult;
 import com.refund.common.core.page.TableDataInfo;
 import com.refund.common.enums.BusinessType;
+import com.refund.common.utils.MessageUtils;
 import com.refund.common.utils.poi.ExcelUtil;
 import com.refund.system.domain.SysConfig;
 import com.refund.system.service.ISysConfigService;
@@ -85,7 +86,7 @@ public class SysConfigController extends BaseController
     {
         if (!configService.checkConfigKeyUnique(config))
         {
-            return error("新增参数'" + config.getConfigName() + "'失败，参数键名已存在");
+            return error(MessageUtils.message("config.add.failed.key.exists", config.getConfigName()));
         }
         config.setCreateBy(getUsername());
         return toAjax(configService.insertConfig(config));
@@ -101,7 +102,7 @@ public class SysConfigController extends BaseController
     {
         if (!configService.checkConfigKeyUnique(config))
         {
-            return error("修改参数'" + config.getConfigName() + "'失败，参数键名已存在");
+            return error(MessageUtils.message("config.update.failed.key.exists", config.getConfigName()));
         }
         config.setUpdateBy(getUsername());
         return toAjax(configService.updateConfig(config));

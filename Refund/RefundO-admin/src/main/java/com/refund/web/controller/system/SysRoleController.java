@@ -22,6 +22,7 @@ import com.refund.common.core.domain.entity.SysUser;
 import com.refund.common.core.domain.model.LoginUser;
 import com.refund.common.core.page.TableDataInfo;
 import com.refund.common.enums.BusinessType;
+import com.refund.common.utils.MessageUtils;
 import com.refund.common.utils.StringUtils;
 import com.refund.common.utils.poi.ExcelUtil;
 import com.refund.framework.web.service.SysPermissionService;
@@ -95,11 +96,11 @@ public class SysRoleController extends BaseController
     {
         if (!roleService.checkRoleNameUnique(role))
         {
-            return error("新增角色'" + role.getRoleName() + "'失败，角色名称已存在");
+            return error(MessageUtils.message("role.add.failed.name.exists", role.getRoleName()));
         }
         else if (!roleService.checkRoleKeyUnique(role))
         {
-            return error("新增角色'" + role.getRoleName() + "'失败，角色权限已存在");
+            return error(MessageUtils.message("role.add.failed.key.exists", role.getRoleName()));
         }
         role.setCreateBy(getUsername());
         return toAjax(roleService.insertRole(role));
@@ -118,14 +119,14 @@ public class SysRoleController extends BaseController
         roleService.checkRoleDataScope(role.getRoleId());
         if (!roleService.checkRoleNameUnique(role))
         {
-            return error("修改角色'" + role.getRoleName() + "'失败，角色名称已存在");
+            return error(MessageUtils.message("role.update.failed.name.exists", role.getRoleName()));
         }
         else if (!roleService.checkRoleKeyUnique(role))
         {
-            return error("修改角色'" + role.getRoleName() + "'失败，角色权限已存在");
+            return error(MessageUtils.message("role.update.failed.key.exists", role.getRoleName()));
         }
         role.setUpdateBy(getUsername());
-        
+
         if (roleService.updateRole(role) > 0)
         {
             // 更新缓存用户权限
@@ -138,7 +139,7 @@ public class SysRoleController extends BaseController
             }
             return success();
         }
-        return error("修改角色'" + role.getRoleName() + "'失败，请联系管理员");
+        return error(MessageUtils.message("role.update.failed", role.getRoleName()));
     }
 
     /**

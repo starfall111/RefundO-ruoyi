@@ -13,6 +13,7 @@ import com.refund.common.core.domain.entity.SysDictData;
 import com.refund.common.core.domain.entity.SysDictType;
 import com.refund.common.exception.ServiceException;
 import com.refund.common.utils.DictUtils;
+import com.refund.common.utils.MessageUtils;
 import com.refund.common.utils.StringUtils;
 import com.refund.system.mapper.SysDictDataMapper;
 import com.refund.system.mapper.SysDictTypeMapper;
@@ -124,7 +125,7 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService
             SysDictType dictType = selectDictTypeById(dictId);
             if (dictDataMapper.countDictDataByType(dictType.getDictType()) > 0)
             {
-                throw new ServiceException(String.format("%1$s已分配,不能删除", dictType.getDictName()));
+                throw new ServiceException(MessageUtils.message("dict.has.assigned", dictType.getDictName()));
             }
             dictTypeMapper.deleteDictTypeById(dictId);
             DictUtils.removeDictCache(dictType.getDictType());

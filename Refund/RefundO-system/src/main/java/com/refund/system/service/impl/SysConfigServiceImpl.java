@@ -12,6 +12,7 @@ import com.refund.common.core.redis.RedisCache;
 import com.refund.common.core.text.Convert;
 import com.refund.common.enums.DataSourceType;
 import com.refund.common.exception.ServiceException;
+import com.refund.common.utils.MessageUtils;
 import com.refund.common.utils.StringUtils;
 import com.refund.system.domain.SysConfig;
 import com.refund.system.mapper.SysConfigMapper;
@@ -161,7 +162,7 @@ public class SysConfigServiceImpl implements ISysConfigService
             SysConfig config = selectConfigById(configId);
             if (StringUtils.equals(UserConstants.YES, config.getConfigType()))
             {
-                throw new ServiceException(String.format("内置参数【%1$s】不能删除 ", config.getConfigKey()));
+                throw new ServiceException(MessageUtils.message("config.not.allow.delete", config.getConfigKey()));
             }
             configMapper.deleteConfigById(configId);
             redisCache.deleteObject(getCacheKey(config.getConfigKey()));

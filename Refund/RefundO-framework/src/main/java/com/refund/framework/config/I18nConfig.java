@@ -3,16 +3,15 @@ package com.refund.framework.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.LocaleResolver;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
-import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 import com.refund.common.constant.Constants;
 
 /**
  * 资源文件配置加载
- * 
+ * 支持从请求头读取语言标识（Accept-Language: zh-CN 或 en-US）
+ *
  * @author ruoyi
+ * @author refund
  */
 @Configuration
 public class I18nConfig implements WebMvcConfigurer
@@ -20,24 +19,12 @@ public class I18nConfig implements WebMvcConfigurer
     @Bean
     public LocaleResolver localeResolver()
     {
-        SessionLocaleResolver slr = new SessionLocaleResolver();
+        HeaderLocaleResolver resolver = new HeaderLocaleResolver();
         // 默认语言
-        slr.setDefaultLocale(Constants.DEFAULT_LOCALE);
-        return slr;
-    }
-
-    @Bean
-    public LocaleChangeInterceptor localeChangeInterceptor()
-    {
-        LocaleChangeInterceptor lci = new LocaleChangeInterceptor();
-        // 参数名
-        lci.setParamName("lang");
-        return lci;
-    }
-
-    @Override
-    public void addInterceptors(InterceptorRegistry registry)
-    {
-        registry.addInterceptor(localeChangeInterceptor());
+        // 从请求头 Accept-Language 读取语言标识
+        // zh-CN 或 zh_CN: 简体中文
+        // zh-TW 或 zh_TW: 繁体中文
+        // en: 英文
+        return resolver;
     }
 }

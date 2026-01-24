@@ -13,6 +13,7 @@ import com.refund.common.constant.UserConstants;
 import com.refund.common.core.domain.entity.SysRole;
 import com.refund.common.core.domain.entity.SysUser;
 import com.refund.common.exception.ServiceException;
+import com.refund.common.utils.MessageUtils;
 import com.refund.common.utils.SecurityUtils;
 import com.refund.common.utils.StringUtils;
 import com.refund.common.utils.spring.SpringUtils;
@@ -185,7 +186,7 @@ public class SysRoleServiceImpl implements ISysRoleService
     {
         if (StringUtils.isNotNull(role.getRoleId()) && role.isAdmin())
         {
-            throw new ServiceException("不允许操作超级管理员角色");
+            throw new ServiceException(MessageUtils.message("role.not.allow.admin"));
         }
     }
 
@@ -206,7 +207,7 @@ public class SysRoleServiceImpl implements ISysRoleService
                 List<SysRole> roles = SpringUtils.getAopProxy(this).selectRoleList(role);
                 if (StringUtils.isEmpty(roles))
                 {
-                    throw new ServiceException("没有权限访问角色数据！");
+                    throw new ServiceException(MessageUtils.message("data.permission.no_role"));
                 }
             }
         }
@@ -368,7 +369,7 @@ public class SysRoleServiceImpl implements ISysRoleService
             SysRole role = selectRoleById(roleId);
             if (countUserRoleByRoleId(roleId) > 0)
             {
-                throw new ServiceException(String.format("%1$s已分配,不能删除", role.getRoleName()));
+                throw new ServiceException(MessageUtils.message("role.has.assigned", role.getRoleName()));
             }
         }
         // 删除角色与菜单关联

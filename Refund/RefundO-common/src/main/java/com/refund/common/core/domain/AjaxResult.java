@@ -3,6 +3,7 @@ package com.refund.common.core.domain;
 import java.util.HashMap;
 import java.util.Objects;
 import com.refund.common.constant.HttpStatus;
+import com.refund.common.utils.MessageUtils;
 import com.refund.common.utils.StringUtils;
 
 /**
@@ -61,22 +62,22 @@ public class AjaxResult extends HashMap<String, Object>
 
     /**
      * 返回成功消息
-     * 
+     *
      * @return 成功消息
      */
     public static AjaxResult success()
     {
-        return AjaxResult.success("操作成功");
+        return AjaxResult.success(MessageUtils.message("common.operation.success"));
     }
 
     /**
      * 返回成功数据
-     * 
+     *
      * @return 成功消息
      */
     public static AjaxResult success(Object data)
     {
-        return AjaxResult.success("操作成功", data);
+        return AjaxResult.success(MessageUtils.message("common.operation.success"), data);
     }
 
     /**
@@ -127,12 +128,12 @@ public class AjaxResult extends HashMap<String, Object>
 
     /**
      * 返回错误消息
-     * 
+     *
      * @return 错误消息
      */
     public static AjaxResult error()
     {
-        return AjaxResult.error("操作失败");
+        return AjaxResult.error(MessageUtils.message("common.operation.failed"));
     }
 
     /**

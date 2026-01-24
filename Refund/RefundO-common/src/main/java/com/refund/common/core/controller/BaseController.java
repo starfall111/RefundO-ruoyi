@@ -16,6 +16,7 @@ import com.refund.common.core.page.PageDomain;
 import com.refund.common.core.page.TableDataInfo;
 import com.refund.common.core.page.TableSupport;
 import com.refund.common.utils.DateUtils;
+import com.refund.common.utils.MessageUtils;
 import com.refund.common.utils.PageUtils;
 import com.refund.common.utils.SecurityUtils;
 import com.refund.common.utils.StringUtils;
@@ -84,7 +85,7 @@ public class BaseController
     {
         TableDataInfo rspData = new TableDataInfo();
         rspData.setCode(HttpStatus.SUCCESS);
-        rspData.setMsg("查询成功");
+        rspData.setMsg(MessageUtils.message("common.query.success"));
         rspData.setRows(list);
         rspData.setTotal(new PageInfo(list).getTotal());
         return rspData;

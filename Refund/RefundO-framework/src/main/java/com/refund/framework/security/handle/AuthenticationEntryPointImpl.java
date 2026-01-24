@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import com.alibaba.fastjson2.JSON;
 import com.refund.common.constant.HttpStatus;
 import com.refund.common.core.domain.AjaxResult;
+import com.refund.common.utils.MessageUtils;
 import com.refund.common.utils.ServletUtils;
 import com.refund.common.utils.StringUtils;
 
@@ -28,7 +29,7 @@ public class AuthenticationEntryPointImpl implements AuthenticationEntryPoint, S
             throws IOException
     {
         int code = HttpStatus.UNAUTHORIZED;
-        String msg = StringUtils.format("请求访问：{}，认证失败，无法访问系统资源", request.getRequestURI());
+        String msg = MessageUtils.message("exception.unauthorized_access", request.getRequestURI());
         ServletUtils.renderString(response, JSON.toJSONString(AjaxResult.error(code, msg)));
     }
 }

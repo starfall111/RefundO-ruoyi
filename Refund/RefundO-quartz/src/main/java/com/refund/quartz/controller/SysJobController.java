@@ -20,6 +20,7 @@ import com.refund.common.core.domain.AjaxResult;
 import com.refund.common.core.page.TableDataInfo;
 import com.refund.common.enums.BusinessType;
 import com.refund.common.exception.job.TaskException;
+import com.refund.common.utils.MessageUtils;
 import com.refund.common.utils.StringUtils;
 import com.refund.common.utils.poi.ExcelUtil;
 import com.refund.quartz.domain.SysJob;
@@ -84,27 +85,27 @@ public class SysJobController extends BaseController
     {
         if (!CronUtils.isValid(job.getCronExpression()))
         {
-            return error("新增任务'" + job.getJobName() + "'失败，Cron表达式不正确");
+            return error(MessageUtils.message("job.add.failed.cron", job.getJobName()));
         }
         else if (StringUtils.containsIgnoreCase(job.getInvokeTarget(), Constants.LOOKUP_RMI))
         {
-            return error("新增任务'" + job.getJobName() + "'失败，目标字符串不允许'rmi'调用");
+            return error(MessageUtils.message("job.add.failed.rmi", job.getJobName()));
         }
         else if (StringUtils.containsAnyIgnoreCase(job.getInvokeTarget(), new String[] { Constants.LOOKUP_LDAP, Constants.LOOKUP_LDAPS }))
         {
-            return error("新增任务'" + job.getJobName() + "'失败，目标字符串不允许'ldap(s)'调用");
+            return error(MessageUtils.message("job.add.failed.ldap", job.getJobName()));
         }
         else if (StringUtils.containsAnyIgnoreCase(job.getInvokeTarget(), new String[] { Constants.HTTP, Constants.HTTPS }))
         {
-            return error("新增任务'" + job.getJobName() + "'失败，目标字符串不允许'http(s)'调用");
+            return error(MessageUtils.message("job.add.failed.http", job.getJobName()));
         }
         else if (StringUtils.containsAnyIgnoreCase(job.getInvokeTarget(), Constants.JOB_ERROR_STR))
         {
-            return error("新增任务'" + job.getJobName() + "'失败，目标字符串存在违规");
+            return error(MessageUtils.message("job.add.failed.violation", job.getJobName()));
         }
         else if (!ScheduleUtils.whiteList(job.getInvokeTarget()))
         {
-            return error("新增任务'" + job.getJobName() + "'失败，目标字符串不在白名单内");
+            return error(MessageUtils.message("job.add.failed.whitelist", job.getJobName()));
         }
         job.setCreateBy(getUsername());
         return toAjax(jobService.insertJob(job));
@@ -120,27 +121,27 @@ public class SysJobController extends BaseController
     {
         if (!CronUtils.isValid(job.getCronExpression()))
         {
-            return error("修改任务'" + job.getJobName() + "'失败，Cron表达式不正确");
+            return error(MessageUtils.message("job.update.failed.cron", job.getJobName()));
         }
         else if (StringUtils.containsIgnoreCase(job.getInvokeTarget(), Constants.LOOKUP_RMI))
         {
-            return error("修改任务'" + job.getJobName() + "'失败，目标字符串不允许'rmi'调用");
+            return error(MessageUtils.message("job.update.failed.rmi", job.getJobName()));
         }
         else if (StringUtils.containsAnyIgnoreCase(job.getInvokeTarget(), new String[] { Constants.LOOKUP_LDAP, Constants.LOOKUP_LDAPS }))
         {
-            return error("修改任务'" + job.getJobName() + "'失败，目标字符串不允许'ldap(s)'调用");
+            return error(MessageUtils.message("job.update.failed.ldap", job.getJobName()));
         }
         else if (StringUtils.containsAnyIgnoreCase(job.getInvokeTarget(), new String[] { Constants.HTTP, Constants.HTTPS }))
         {
-            return error("修改任务'" + job.getJobName() + "'失败，目标字符串不允许'http(s)'调用");
+            return error(MessageUtils.message("job.update.failed.http", job.getJobName()));
         }
         else if (StringUtils.containsAnyIgnoreCase(job.getInvokeTarget(), Constants.JOB_ERROR_STR))
         {
-            return error("修改任务'" + job.getJobName() + "'失败，目标字符串存在违规");
+            return error(MessageUtils.message("job.update.failed.violation", job.getJobName()));
         }
         else if (!ScheduleUtils.whiteList(job.getInvokeTarget()))
         {
-            return error("修改任务'" + job.getJobName() + "'失败，目标字符串不在白名单内");
+            return error(MessageUtils.message("job.update.failed.whitelist", job.getJobName()));
         }
         job.setUpdateBy(getUsername());
         return toAjax(jobService.updateJob(job));
@@ -168,7 +169,7 @@ public class SysJobController extends BaseController
     public AjaxResult run(@RequestBody SysJob job) throws SchedulerException
     {
         boolean result = jobService.run(job);
-        return result ? success() : error("任务不存在或已过期！");
+        return result ? success() : error(MessageUtils.message("job.not.exists"));
     }
 
     /**

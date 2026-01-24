@@ -18,6 +18,7 @@ import com.refund.common.core.controller.BaseController;
 import com.refund.common.core.domain.AjaxResult;
 import com.refund.common.core.page.TableDataInfo;
 import com.refund.common.enums.BusinessType;
+import com.refund.common.utils.MessageUtils;
 import com.refund.common.utils.poi.ExcelUtil;
 import com.refund.system.domain.SysPost;
 import com.refund.system.service.ISysPostService;
@@ -76,11 +77,11 @@ public class SysPostController extends BaseController
     {
         if (!postService.checkPostNameUnique(post))
         {
-            return error("新增岗位'" + post.getPostName() + "'失败，岗位名称已存在");
+            return error(MessageUtils.message("post.add.failed.name.exists", post.getPostName()));
         }
         else if (!postService.checkPostCodeUnique(post))
         {
-            return error("新增岗位'" + post.getPostName() + "'失败，岗位编码已存在");
+            return error(MessageUtils.message("post.add.failed.code.exists", post.getPostName()));
         }
         post.setCreateBy(getUsername());
         return toAjax(postService.insertPost(post));
@@ -96,11 +97,11 @@ public class SysPostController extends BaseController
     {
         if (!postService.checkPostNameUnique(post))
         {
-            return error("修改岗位'" + post.getPostName() + "'失败，岗位名称已存在");
+            return error(MessageUtils.message("post.update.failed.name.exists", post.getPostName()));
         }
         else if (!postService.checkPostCodeUnique(post))
         {
-            return error("修改岗位'" + post.getPostName() + "'失败，岗位编码已存在");
+            return error(MessageUtils.message("post.update.failed.code.exists", post.getPostName()));
         }
         post.setUpdateBy(getUsername());
         return toAjax(postService.updatePost(post));

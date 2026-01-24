@@ -16,6 +16,7 @@ import com.refund.common.constant.UserConstants;
 import com.refund.common.core.domain.entity.SysRole;
 import com.refund.common.core.domain.entity.SysUser;
 import com.refund.common.exception.ServiceException;
+import com.refund.common.utils.MessageUtils;
 import com.refund.common.utils.SecurityUtils;
 import com.refund.common.utils.StringUtils;
 import com.refund.common.utils.bean.BeanValidators;
@@ -227,7 +228,7 @@ public class SysUserServiceImpl implements ISysUserService
     {
         if (StringUtils.isNotNull(user.getUserId()) && user.isAdmin())
         {
-            throw new ServiceException("不允许操作超级管理员用户");
+            throw new ServiceException(MessageUtils.message("user.not.allow.admin"));
         }
     }
 
@@ -246,7 +247,7 @@ public class SysUserServiceImpl implements ISysUserService
             List<SysUser> users = SpringUtils.getAopProxy(this).selectUserList(user);
             if (StringUtils.isEmpty(users))
             {
-                throw new ServiceException("没有权限访问用户数据！");
+                throw new ServiceException(MessageUtils.message("data.permission.no_user"));
             }
         }
     }

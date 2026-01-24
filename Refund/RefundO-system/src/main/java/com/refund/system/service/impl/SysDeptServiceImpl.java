@@ -14,6 +14,7 @@ import com.refund.common.core.domain.entity.SysRole;
 import com.refund.common.core.domain.entity.SysUser;
 import com.refund.common.core.text.Convert;
 import com.refund.common.exception.ServiceException;
+import com.refund.common.utils.MessageUtils;
 import com.refund.common.utils.SecurityUtils;
 import com.refund.common.utils.StringUtils;
 import com.refund.common.utils.spring.SpringUtils;
@@ -197,7 +198,7 @@ public class SysDeptServiceImpl implements ISysDeptService
             List<SysDept> depts = SpringUtils.getAopProxy(this).selectDeptList(dept);
             if (StringUtils.isEmpty(depts))
             {
-                throw new ServiceException("没有权限访问部门数据！");
+                throw new ServiceException(MessageUtils.message("data.permission.no_dept"));
             }
         }
     }
@@ -215,7 +216,7 @@ public class SysDeptServiceImpl implements ISysDeptService
         // 如果父节点不为正常状态,则不允许新增子节点
         if (!UserConstants.DEPT_NORMAL.equals(info.getStatus()))
         {
-            throw new ServiceException("部门停用，不允许新增");
+            throw new ServiceException(MessageUtils.message("dept.disabled.not_allowed_add"));
         }
         dept.setAncestors(info.getAncestors() + "," + dept.getParentId());
         return deptMapper.insertDept(dept);

@@ -29,7 +29,7 @@ public class AddressUtils
         // 内网不查询
         if (IpUtils.internalIp(ip))
         {
-            return "内网IP";
+            return "Intranet IP";
         }
         if (RuoYiConfig.isAddressEnabled())
         {

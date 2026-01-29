@@ -19,18 +19,18 @@ public class RfFaqCategories extends TreeEntity
     private Long id;
 
     /** 分类名称 */
-    @Excel(name = "分类名称")
+    @Excel(name = "Category Name")
     private String categoryName;
 
     /** 分类描述 */
     private String categoryDescription;
 
     /** 排序 */
-    @Excel(name = "排序")
+    @Excel(name = "Sort Order")
     private Long sortOrder;
 
     /** 状态：0-禁用，1-启用 */
-    @Excel(name = "状态：0-禁用，1-启用")
+    @Excel(name = " Status: 0-Disabled, 1-Enabled")
     private Long status;
 
     public void setId(Long id) 

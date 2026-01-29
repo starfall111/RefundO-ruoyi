@@ -20,23 +20,23 @@ public class RfUsers extends BaseEntity
     private Long userId;
 
     /** 用户名 */
-    @Excel(name = "用户名")
+    @Excel(name = "Username")
     private String username;
 
     /** 余额 */
-    @Excel(name = "余额")
+    @Excel(name = "Balance")
     private BigDecimal balance;
 
     /** 状态 */
-    @Excel(name = "状态")
+    @Excel(name = "Status")
     private Long userStatus;
 
     /** 手机号 */
-    @Excel(name = "手机号")
+    @Excel(name = "Phone Number")
     private String phoneNumber;
 
     /** 邮箱 */
-    @Excel(name = "邮箱")
+    @Excel(name = "Email")
     private String email;
 
     /** sangke */
@@ -49,7 +49,7 @@ public class RfUsers extends BaseEntity
     private String password;
 
     /** 封禁次数 */
-    @Excel(name = "封禁次数")
+    @Excel(name = "Ban Count")
     private Long bansCount;
 
     public void setUserId(Long userId) 

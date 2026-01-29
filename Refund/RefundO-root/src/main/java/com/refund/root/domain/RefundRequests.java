@@ -24,13 +24,13 @@ public class RefundRequests extends BaseEntity {
     /**
      * 申请状态
      */
-    @Excel(name = "申请状态")
+    @Excel(name = "Request Status")
     private Long requestStatus;
 
     /**
      * 申请金额
      */
-    @Excel(name = "申请金额")
+    @Excel(name = "Request Amount")
     private BigDecimal amount;
 
     /**
@@ -46,19 +46,19 @@ public class RefundRequests extends BaseEntity {
     /**
      * 用户ID
      */
-    @Excel(name = "用户ID")
+    @Excel(name = "User ID")
     private Long userId;
 
     /**
      * 处理员ID
      */
-    @Excel(name = "处理员ID")
+    @Excel(name = "Handler ID")
     private Long adminId;
 
     /**
      * 支付方式 0为手机 1为sangke 2为wave
      */
-    @Excel(name = "支付方式 0为手机 1为sangke 2为wave")
+    @Excel(name = "Payment Method (0=Mobile, 1=Sangke, 2=Wave)")
     private Integer paymentMethod;
 
     /**
@@ -69,13 +69,13 @@ public class RefundRequests extends BaseEntity {
     /**
      * 请求编号
      */
-    @Excel(name = "请求编号")
+    @Excel(name = "Request Number")
     private String requestNumber;
 
     /**
      * 扫描ID
      */
-    @Excel(name = "扫描ID")
+    @Excel(name = "Scan IDs")
     private String scanIds;
 
     public String getScanId() {

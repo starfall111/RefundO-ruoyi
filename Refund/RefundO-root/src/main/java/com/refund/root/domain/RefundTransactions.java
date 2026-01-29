@@ -24,55 +24,55 @@ public class RefundTransactions extends BaseEntity {
     /**
      * 申请编号
      */
-    @Excel(name = "申请编号")
+    @Excel(name = "Request ID")
     private Long requestId;
 
     /**
      * 交易员ID
      */
-    @Excel(name = "交易员ID")
+    @Excel(name = "Trader ID")
     private Long adminId;
 
     /**
      * 汇款凭证
      */
-    @Excel(name = "汇款凭证")
+    @Excel(name = "Remittance Receipt")
     private String remittanceReceipt;
 
     /**
      * 交易状态
      */
-    @Excel(name = "交易状态")
+    @Excel(name = "Transaction Status")
     private Long transStatus;
 
     /**
      * 交易编号
      */
-    @Excel(name = "交易编号")
+    @Excel(name = "Transaction Number")
     private String refundNumber;
 
     /**
      * 付款方式
      */
-    @Excel(name = "付款方式")
+    @Excel(name = "Payment Method")
     private Integer paymentMethod;
 
     /**
      * 付款账号
      */
-    @Excel(name = "付款账号")
+    @Excel(name = "Payment Account")
     private String paymentNumber;
 
     /**
      * 金额
      */
-    @Excel(name = "金额")
+    @Excel(name = "Amount")
     private BigDecimal amount;
 
     /**
      * 拒绝理由
      */
-    @Excel(name = "拒绝理由")
+    @Excel(name = "Reject Reason")
     private String rejectReason;
 
     public String getRejectReason() {

@@ -16,40 +16,40 @@ public class SysLogininfor extends BaseEntity
     private static final long serialVersionUID = 1L;
 
     /** ID */
-    @Excel(name = "序号", cellType = ColumnType.NUMERIC)
+    @Excel(name = "Serial Number", cellType = ColumnType.NUMERIC)
     private Long infoId;
 
     /** 用户账号 */
-    @Excel(name = "用户账号")
+    @Excel(name = "User Account")
     private String userName;
 
     /** 登录状态 0成功 1失败 */
-    @Excel(name = "登录状态", readConverterExp = "0=成功,1=失败")
+    @Excel(name = "Login Status", readConverterExp = "0=Success,1=Failed")
     private String status;
 
     /** 登录IP地址 */
-    @Excel(name = "登录地址")
+    @Excel(name = "Login Address")
     private String ipaddr;
 
     /** 登录地点 */
-    @Excel(name = "登录地点")
+    @Excel(name = "Login Location")
     private String loginLocation;
 
     /** 浏览器类型 */
-    @Excel(name = "浏览器")
+    @Excel(name = "Browser")
     private String browser;
 
     /** 操作系统 */
-    @Excel(name = "操作系统")
+    @Excel(name = "Operating System")
     private String os;
 
     /** 提示消息 */
-    @Excel(name = "提示消息")
+    @Excel(name = "Message")
     private String msg;
 
     /** 访问时间 */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @Excel(name = "访问时间", width = 30, dateFormat = "yyyy-MM-dd HH:mm:ss")
+    @Excel(name = "Access Time", width = 30, dateFormat = "yyyy-MM-dd HH:mm:ss")
     private Date loginTime;
 
     public Long getInfoId()

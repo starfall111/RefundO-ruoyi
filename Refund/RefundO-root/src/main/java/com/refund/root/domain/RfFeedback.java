@@ -19,19 +19,19 @@ public class RfFeedback extends BaseEntity
     private Long feedbackId;
 
     /** 用户ID */
-    @Excel(name = "用户ID")
+    @Excel(name = "User ID")
     private Long userId;
 
     /** 类型 */
-    @Excel(name = "类型")
+    @Excel(name = "Type")
     private Long feedbackType;
 
     /** 详细内容 */
-    @Excel(name = "详细内容")
+    @Excel(name = "Content")
     private String content;
 
     /** 联系方式 */
-    @Excel(name = "联系方式")
+    @Excel(name = "Contact Info")
     private String contactInfo;
 
     /** 反馈状态：0-未处理 1-处理中 2-已处理 3-已关闭 */

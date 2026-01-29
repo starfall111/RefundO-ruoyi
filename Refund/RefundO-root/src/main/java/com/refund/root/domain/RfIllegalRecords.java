@@ -18,20 +18,20 @@ public class RfIllegalRecords extends BaseEntity
     private static final long serialVersionUID = 1L;
 
     /** 违规记录ID */
-    @Excel(name = "违规记录ID")
+    @Excel(name = "Violation Record ID")
     private Long illegalId;
 
     /** 违规原因详细描述 */
-    @Excel(name = "违规原因详细描述")
+    @Excel(name = "Violation Reason")
     private String reason;
 
     /** 违规时间 */
     @JsonFormat(pattern = "yyyy-MM-dd")
-    @Excel(name = "违规时间", width = 30, dateFormat = "yyyy-MM-dd")
+    @Excel(name = "Violation Time", width = 30, dateFormat = "yyyy-MM-dd")
     private Date scanTime;
 
     /** 违规用户 */
-    @Excel(name = "违规用户")
+    @Excel(name = "Violation User ID")
     private Long userId;
 
     public void setIllegalId(Long illegalId) 

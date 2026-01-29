@@ -20,23 +20,23 @@ public class RfFaqs extends BaseEntity
     private Long id;
 
     /** 所属分类ID */
-    @Excel(name = "所属分类ID")
+    @Excel(name = "Category ID")
     private Long categoryId;
 
     /** 问题 */
-    @Excel(name = "问题")
+    @Excel(name = "Question")
     private String question;
 
     /** 答案 */
-    @Excel(name = "答案")
+    @Excel(name = "Answer")
     private String answer;
 
     /** 浏览次数 */
-    @Excel(name = "浏览次数")
+    @Excel(name = "View Count")
     private Long viewCount;
 
     /** 是否置顶 */
-    @Excel(name = "是否置顶")
+    @Excel(name = "Is Top")
     private Long isTop;
 
     /**  */

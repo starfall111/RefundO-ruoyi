@@ -24,38 +24,38 @@ public class RfScanRecords extends BaseEntity
 
     /** 扫码时间 */
     @JsonFormat(pattern = "yyyy-MM-dd")
-    @Excel(name = "扫码时间", width = 30, dateFormat = "yyyy-MM-dd")
+    @Excel(name = "Scan Time", width = 30, dateFormat = "yyyy-MM-dd")
     private Date scanTime;
 
     /** 是否离线扫码: 1-是 0-否 */
     private Integer isOffline;
 
     /** 用户ID */
-    @Excel(name = "用户ID")
+    @Excel(name = "User ID")
     private Long userId;
 
     /** 产品ID */
-    @Excel(name = "产品ID")
+    @Excel(name = "Product ID")
     private Long productId;
 
     /** 产品状态 */
-    @Excel(name = "产品状态")
+    @Excel(name = "Product Status")
     private Integer refundStatus;
 
     /** 扫描编号 */
-    @Excel(name = "扫描编号")
+    @Excel(name = "Scan Number")
     private String scanNumber;
 
     /** 退款金额 */
-    @Excel(name = "退款金额")
+    @Excel(name = "Refund Amount")
     private BigDecimal value;
 
     /** 退款比例 */
-    @Excel(name = "退款比例")
+    @Excel(name = "Refund Ratio")
     private BigDecimal refundRatio;
 
     /** 原价 */
-    @Excel(name = "原价")
+    @Excel(name = "Original Price")
     private BigDecimal originalPrice;
 
     public void setScanId(Long scanId) 

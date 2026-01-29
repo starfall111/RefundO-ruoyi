@@ -17,31 +17,31 @@ public class RfAppVersion extends BaseEntity
     private static final long serialVersionUID = 1L;
 
     /** 版本ID */
-    @Excel(name = "版本ID")
+    @Excel(name = "Version ID")
     private Long versionId;
 
     /** 版本状态 */
-    @Excel(name = "版本状态")
+    @Excel(name = "Version Status")
     private Long updateStatus;
 
     /** 版本code */
-    @Excel(name = "版本code")
+    @Excel(name = "Version Code")
     private Long versionCode;
 
     /** 版本名 */
-    @Excel(name = "版本名")
+    @Excel(name = "Version Name")
     private String versionName;
 
     /** 更新内容 */
-    @Excel(name = "更新内容")
+    @Excel(name = "Update Content")
     private String modifyContent;
 
     /** 安装包 */
-    @Excel(name = "安装包")
+    @Excel(name = "Download URL")
     private String downloadUrl;
 
     /** 安装包大小 */
-    @Excel(name = "安装包大小")
+    @Excel(name = "APK Size")
     private BigDecimal apkSize;
 
     /** 1111 */

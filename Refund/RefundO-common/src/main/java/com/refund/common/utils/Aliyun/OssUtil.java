@@ -99,6 +99,7 @@ public class OssUtil {
             PutObjectResult result = ossClient.putObject(putObjectRequest);
 
         } catch (OSSException oe) {
+
             System.out.println("Caught an OSSException, which means your request made it to OSS, "
                     + "but was rejected with an error response for some reason.");
             System.out.println("Error Message:" + oe.getErrorMessage());

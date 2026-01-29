@@ -12,13 +12,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="contactInfo"    column="contact_info"    />
         <result property="feedbackStatus"    column="feedback_status"    />
         <result property="createTime"    column="create_time"    />
-        <result property="updateTime"    column="update_time"    />
         <result property="adminId"    column="admin_id"    />
         <result property="handleRemark"    column="handle_remark"    />
     </resultMap>
 
     <sql id="selectRfFeedbackVo">
-        select feedback_id, user_id, feedback_type, content, contact_info, feedback_status, create_time, update_time, admin_id, handle_remark from rf_feedback
+        select feedback_id, user_id, feedback_type, content, contact_info, feedback_status, create_time, admin_id, handle_remark from rf_feedback
     </sql>
 
     <select id="selectRfFeedbackList" parameterType="RfFeedback" resultMap="RfFeedbackResult">
@@ -46,7 +45,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="contactInfo != null">contact_info,</if>
             <if test="feedbackStatus != null">feedback_status,</if>
             <if test="createTime != null">create_time,</if>
-            <if test="updateTime != null">update_time,</if>
             <if test="adminId != null">admin_id,</if>
             <if test="handleRemark != null">handle_remark,</if>
          </trim>
@@ -57,7 +55,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="contactInfo != null">#{contactInfo},</if>
             <if test="feedbackStatus != null">#{feedbackStatus},</if>
             <if test="createTime != null">#{createTime},</if>
-            <if test="updateTime != null">#{updateTime},</if>
             <if test="adminId != null">#{adminId},</if>
             <if test="handleRemark != null">#{handleRemark},</if>
          </trim>
@@ -72,7 +69,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="contactInfo != null">contact_info = #{contactInfo},</if>
             <if test="feedbackStatus != null">feedback_status = #{feedbackStatus},</if>
             <if test="createTime != null">create_time = #{createTime},</if>
-            <if test="updateTime != null">update_time = #{updateTime},</if>
             <if test="adminId != null">admin_id = #{adminId},</if>
             <if test="handleRemark != null">handle_remark = #{handleRemark},</if>
         </trim>

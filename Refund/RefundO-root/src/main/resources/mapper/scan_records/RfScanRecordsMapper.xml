@@ -23,12 +23,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <select id="selectRfScanRecordsList" parameterType="RfScanRecords" resultMap="RfScanRecordsResult">
         <include refid="selectRfScanRecordsVo"/>
-        <where>  
+        <where>
+            <if test="scanId != null "> and scan_id = #{scanId}</if>
             <if test="scanTime != null "> and scan_time = #{scanTime}</if>
             <if test="userId != null "> and user_id = #{userId}</if>
             <if test="productId != null "> and rf_scan_records.product_id = #{productId}</if>
             <if test="refundStatus != null "> and refund_status = #{refundStatus}</if>
-            <if test="scanNumber != null  and scanNumber != ''"> and scan_number = #{scanNumber}</if>
         </where>
     </select>
     

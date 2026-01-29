@@ -47,9 +47,7 @@
             <if test="userId != null ">and user_id = #{userId}</if>
             <if test="adminId != null ">and admin_id = #{adminId}</if>
             <if test="paymentMethod != null ">and payment_method = #{paymentMethod}</if>
-            <if test="requestNumber != null  and requestNumber != ''">and request_number like
-                concat(#{requestNumber},'%')
-            </if>
+            <if test="requestId != null ">and request_id = #{requestId}</if>
             <if test="scanId != null">and scan_ids like concat(#{scanIds},'%') </if>
         </where>
         order by update_time desc

@@ -18,8 +18,8 @@ public class RfScanRecords extends BaseEntity
 {
     private static final long serialVersionUID = 1L;
 
-    /**  */
-    @Excel(name = "")
+    /** 扫描ID */
+    @Excel(name = "Scan ID")
     private Long scanId;
 
     /** 扫码时间 */

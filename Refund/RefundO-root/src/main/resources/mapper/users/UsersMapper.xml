@@ -24,8 +24,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <select id="selectUsersList" parameterType="RfUsers" resultMap="UsersResult">
         <include refid="selectUsersVo"/>
-        <where>  
-            <if test="username != null  and username != ''"> and username like concat('%', #{username}, '%')</if>
+        <where>
+            <if test="userId != null "> and user_id = #{userId}</if>
             <if test="balance != null "> and balance = #{balance}</if>
             <if test="userStatus != null "> and user_status = #{userStatus}</if>
             <if test="phoneNumber != null  and phoneNumber != ''"> and phone_number = #{phoneNumber}</if>

@@ -17,7 +17,7 @@ import com.refund.common.config.RuoYiConfig;
 import com.refund.common.core.domain.AjaxResult;
 import com.refund.common.utils.StringUtils;
 import com.refund.common.utils.file.FileUtils;
-import com.refund.common.utils.file.OssFileUploadService;
+import com.refund.common.utils.file.CompositeFileUploadService;
 import com.refund.framework.config.ServerConfig;
 
 /**
@@ -35,7 +35,7 @@ public class CommonController
     private ServerConfig serverConfig;
 
     @Autowired
-    private OssFileUploadService ossFileUploadService;
+    private CompositeFileUploadService compositeFileUploadService;
 
     private static final String FILE_DELIMETER = ",";
 
@@ -93,12 +93,12 @@ public class CommonController
     {
         try
         {
-            // 上传到OSS并返回文件URL
-            String fileName = ossFileUploadService.upload(file);
+            // 统一上传服务：APK文件本地上传，其他文件OSS上传
+            String fileUrl = compositeFileUploadService.upload(file);
             AjaxResult ajax = AjaxResult.success();
-            ajax.put("url", fileName);
-            ajax.put("fileName", fileName);
-            ajax.put("newFileName", FileUtils.getName(fileName));
+            ajax.put("url", fileUrl);
+            ajax.put("fileName", fileUrl);
+            ajax.put("newFileName", FileUtils.getName(fileUrl));
             ajax.put("originalFilename", file.getOriginalFilename());
             return ajax;
         }
@@ -122,11 +122,11 @@ public class CommonController
             List<String> originalFilenames = new ArrayList<String>();
             for (MultipartFile file : files)
             {
-                // 上传到OSS并返回文件URL
-                String fileName = ossFileUploadService.upload(file);
-                urls.add(fileName);
-                fileNames.add(fileName);
-                newFileNames.add(FileUtils.getName(fileName));
+                // 统一上传服务：APK文件本地上传，其他文件OSS上传
+                String fileUrl = compositeFileUploadService.upload(file);
+                urls.add(fileUrl);
+                fileNames.add(fileUrl);
+                newFileNames.add(FileUtils.getName(fileUrl));
                 originalFilenames.add(file.getOriginalFilename());
             }
             AjaxResult ajax = AjaxResult.success();

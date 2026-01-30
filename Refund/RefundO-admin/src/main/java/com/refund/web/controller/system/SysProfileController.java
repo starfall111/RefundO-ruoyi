@@ -1,6 +1,9 @@
 package com.refund.web.controller.system;
 
 import java.util.Map;
+
+import com.refund.common.utils.Aliyun.OssUtil;
+import com.refund.common.utils.file.OssFileUploadService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -42,6 +45,9 @@ public class SysProfileController extends BaseController
     @Autowired
     private TokenService tokenService;
 
+    @Autowired
+    private OssFileUploadService ossFileUploadService;
+
     /**
      * 个人信息
      */
@@ -59,7 +65,7 @@ public class SysProfileController extends BaseController
     /**
      * 修改用户
      */
-    @Log(title = "个人信息", businessType = BusinessType.UPDATE)
+    @Log(title = "personal info", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult updateProfile(@RequestBody SysUser user)
     {
@@ -89,7 +95,7 @@ public class SysProfileController extends BaseController
     /**
      * 重置密码
      */
-    @Log(title = "个人信息", businessType = BusinessType.UPDATE)
+    @Log(title = "user info", businessType = BusinessType.UPDATE)
     @PutMapping("/updatePwd")
     public AjaxResult updatePwd(@RequestBody Map<String, String> params)
     {
@@ -121,14 +127,15 @@ public class SysProfileController extends BaseController
     /**
      * 头像上传
      */
-    @Log(title = "用户头像", businessType = BusinessType.UPDATE)
+    @Log(title = "user avatar", businessType = BusinessType.UPDATE)
     @PostMapping("/avatar")
     public AjaxResult avatar(@RequestParam("avatarfile") MultipartFile file) throws Exception
     {
         if (!file.isEmpty())
         {
             LoginUser loginUser = getLoginUser();
-            String avatar = FileUploadUtils.upload(RuoYiConfig.getAvatarPath(), file, MimeTypeUtils.IMAGE_EXTENSION, true);
+//            String avatar = FileUploadUtils.upload(RuoYiConfig.getAvatarPath(), file, MimeTypeUtils.IMAGE_EXTENSION, true);
+            String avatar = ossFileUploadService.upload(file);
             if (userService.updateUserAvatar(loginUser.getUserId(), avatar))
             {
                 String oldAvatar = loginUser.getUser().getAvatar();

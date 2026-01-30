@@ -1,5 +1,6 @@
 package com.refund.root.service.impl;
 
+import java.math.BigDecimal;
 import java.util.List;
 import com.refund.common.utils.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -103,5 +104,19 @@ public class RfRfUsersServiceImpl implements IRfUsersService
     @Override
     public int updateUsersStatus(Long[] userIds, Integer status) {
         return usersMapper.updateUsersStatus(userIds, status);
+    }
+
+    /**
+     * 原子化增加用户余额（退款返还）
+     * @param userId 用户ID
+     * @param amount 增加金额
+     * @param requestId 退款请求ID
+     * @param allowedStatuses 该请求允许处于的状态列表
+     * @return true-成功, false-失败（状态不匹配或已处理）
+     */
+    @Override
+    public boolean increaseBalanceWithRequestCheck(Long userId, BigDecimal amount, Long requestId, List<Long> allowedStatuses) {
+        int rows = usersMapper.increaseBalanceWithRequestCheck(userId, amount, requestId, allowedStatuses);
+        return rows > 0;
     }
 }

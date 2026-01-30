@@ -37,6 +37,8 @@
         <spring-framework.version>5.3.39</spring-framework.version>
         <aliyun.sdk.oss>3.17.4</aliyun.sdk.oss>
         <lombok>1.18.20</lombok>
+        <jaxb-api>2.3.1</jaxb-api>
+        <javax-activation>1.1.1</javax-activation>
     </properties>
 
     <!-- 依赖声明 -->
@@ -255,6 +257,8 @@
                 <artifactId>jaxb-runtime</artifactId>
                 <version>2.3.3</version>
             </dependency>
+
+
 
         </dependencies>
     </dependencyManagement>

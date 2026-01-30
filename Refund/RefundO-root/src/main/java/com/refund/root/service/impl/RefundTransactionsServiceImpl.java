@@ -3,9 +3,13 @@ package com.refund.root.service.impl;
 import java.util.List;
 
 import com.refund.common.core.domain.model.LoginUser;
+import com.refund.common.service.IMailService;
 import com.refund.common.utils.DateUtils;
 import com.refund.common.utils.SecurityUtils;
+import com.refund.root.domain.RefundRequests;
+import com.refund.root.domain.RfUsers;
 import com.refund.root.service.IRefundRequestsService;
+import com.refund.root.service.IRfUsersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.refund.root.mapper.RefundTransactionsMapper;
@@ -26,6 +30,12 @@ public class RefundTransactionsServiceImpl implements IRefundTransactionsService
 
     @Autowired
     private IRefundRequestsService refundRequestsService;
+
+    @Autowired
+    private IRfUsersService rfUsersService;
+
+    @Autowired
+    private IMailService mailService;
 
     /**
      * 查询退款交易记录

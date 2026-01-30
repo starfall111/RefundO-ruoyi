@@ -126,4 +126,21 @@
             #{requestId}
         </foreach>
     </delete>
+
+    <!-- 查询指定状态的退款请求（用于定时任务） -->
+    <select id="selectRefundRequestsByStatus" resultMap="RefundRequestsResult">
+        <include refid="selectRefundRequestsVo"/>
+        WHERE request_status = #{status}
+        ORDER BY create_time ASC
+    </select>
+
+    <!-- 批量更新退款请求状态（用于定时任务） -->
+    <update id="batchUpdateRequestStatus">
+        UPDATE refund_requests
+        SET request_status = #{status}, update_time = NOW()
+        WHERE request_id IN
+        <foreach collection="requestIds" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
 </mapper>

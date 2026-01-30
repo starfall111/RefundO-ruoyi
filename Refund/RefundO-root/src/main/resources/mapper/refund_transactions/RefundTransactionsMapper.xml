@@ -26,8 +26,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <select id="selectRefundTransactionsList" parameterType="RefundTransactions" resultMap="RefundTransactionsResult">
         <include refid="selectRefundTransactionsVo"/>
         <where>  
-            <if test="requestId != null "> and request_id = #{requestId}</if>
-            <if test="adminId != null "> and admin_id = #{adminId}</if>
+            <if test="requestId != null "> and refund_transactions.request_id = #{requestId}</if>
+            <if test="adminId != null "> and refund_transactions.admin_id = #{adminId}</if>
             <if test="remittanceReceipt != null  and remittanceReceipt != ''"> and remittance_receipt = #{remittanceReceipt}</if>
             <if test="transStatus != null "> and trans_status = #{transStatus}</if>
             <if test="refundNumber != null  and refundNumber != ''"> and refund_number = #{refundNumber}</if>

@@ -1,5 +1,6 @@
 package com.refund.root.mapper;
 
+import java.math.BigDecimal;
 import java.util.List;
 import com.refund.root.domain.RfUsers;
 import org.apache.ibatis.annotations.Mapper;
@@ -70,4 +71,17 @@ public interface RfUsersMapper
      * @return 结果
      */
     int updateUsersStatus(@Param("userIds") Long[] userIds, @Param("status") Integer status);
+
+    /**
+     * 原子化增加用户余额（带退款请求状态校验，实现幂等性）
+     * @param userId 用户ID
+     * @param amount 增加金额
+     * @param requestId 退款请求ID
+     * @param allowedStatuses 该请求允许处于的状态列表（确保幂等性）
+     * @return 影响行数，0表示状态不匹配（已处理或不存在）
+     */
+    int increaseBalanceWithRequestCheck(@Param("userId") Long userId,
+                                         @Param("amount") BigDecimal amount,
+                                         @Param("requestId") Long requestId,
+                                         @Param("allowedStatuses") List<Long> allowedStatuses);
 }

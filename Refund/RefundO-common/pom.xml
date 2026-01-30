@@ -119,6 +119,18 @@
             <artifactId>javax.servlet-api</artifactId>
         </dependency>
 
+        <!-- Spring Boot Mail -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
+        </dependency>
+
+        <!-- 如果需要使用模板邮件，可添加Thymeleaf -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-thymeleaf</artifactId>
+        </dependency>
+
         <!-- 阿里云OSS SDK -->
         <dependency>
             <groupId>com.aliyun.oss</groupId>

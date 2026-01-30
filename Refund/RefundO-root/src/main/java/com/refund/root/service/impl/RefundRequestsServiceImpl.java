@@ -4,12 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.refund.common.core.domain.model.LoginUser;
+import com.refund.common.service.IMailService;
 import com.refund.common.utils.DateUtils;
 import com.refund.common.utils.SecurityUtils;
 import com.refund.root.domain.RefundTransactions;
 import com.refund.root.domain.RfScanRecords;
+import com.refund.root.domain.RfUsers;
 import com.refund.root.mapper.RefundTransactionsMapper;
 import com.refund.root.service.IRfScanRecordsService;
+import com.refund.root.service.IRfUsersService;
 import com.refund.root.utils.numberGenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -37,6 +40,12 @@ public class RefundRequestsServiceImpl implements IRefundRequestsService
 
     @Autowired
     private numberGenUtils numberGenUtil;
+
+    @Autowired
+    private IRfUsersService rfUsersService;
+
+    @Autowired
+    private IMailService mailService;
 
     /**
      * 查询退款申请
@@ -135,11 +144,37 @@ public class RefundRequestsServiceImpl implements IRefundRequestsService
             }
         }
 
-        //当审批拒绝或交易失败时，修改扫描记录状态为0
+        //当审批拒绝或交易失败时，修改扫描记录状态为0并返还余额
         if(status == 2 || status == 5){
             for(Long requestId : requestIds){
+                RefundRequests request = refundRequestsMapper.selectRefundRequestsByRequestId(requestId);
+
+                // 根据目标状态确定允许的前置状态
+                List<Long> allowedStatuses = new ArrayList<>();
+                if(status == 2) {
+                    // 审批拒绝：前置状态必须是 0（待审批）
+                    allowedStatuses.add(0L);
+                } else{
+                    // 交易失败：前置状态必须是 3（退款中）
+                    allowedStatuses.add(3L);
+                }
+
+                // 先原子化返还余额（状态校验确保幂等性）
+                boolean balanceReturned = rfUsersService.increaseBalanceWithRequestCheck(
+                        request.getUserId(),
+                        request.getAmount(),
+                        requestId,
+                        allowedStatuses
+                );
+
+                if (!balanceReturned) {
+                    // 余额返还失败（状态已变更或其他原因），记录日志
+                    System.err.println("余额返还失败，请求状态可能已变更, requestId: " + requestId + ", userId: " + request.getUserId() + ", targetStatus: " + status);
+                }
+
+                // 修改扫描记录状态为0
                 RfScanRecords rfScanRecords = new RfScanRecords();
-                String ScanIds = refundRequestsMapper.selectRefundRequestsByRequestId(requestId).getScanId();
+                String ScanIds = request.getScanId();
                 String[] ScanIdArray = ScanIds.split(",");
 //                将扫描记录ID转为Long类型
                 Long[] scanIdArray = new Long[ScanIdArray.length];
@@ -157,24 +192,45 @@ public class RefundRequestsServiceImpl implements IRefundRequestsService
         int result = refundRequestsMapper.updateRefundRequestsStatus(requestIds, status,rejectReason,userId);
 
         if(status == 1){
-            //在向交易表中批量插入数据
-            List<RefundTransactions> refundTransactionsList = new ArrayList<>();
+            // 不再立即创建交易记录，由定时任务处理
 
+            // 发送审批通过邮件
             for(Long requestId : requestIds){
-                String refundNumber = numberGenUtil.genTransNumber();
-                RefundTransactions refundTransactions = new RefundTransactions();
-                refundTransactions.setRequestId(requestId);
-                refundTransactions.setAdminId(userId);
-                refundTransactions.setTransStatus(Long.valueOf(0));
-                refundTransactions.setCreateTime(DateUtils.getNowDate());
-                refundTransactions.setUpdateTime(DateUtils.getNowDate());
-                refundTransactions.setRefundNumber(refundNumber);
-                refundTransactionsList.add(refundTransactions);
-
+                RefundRequests request = refundRequestsMapper.selectRefundRequestsByRequestId(requestId);
+                RfUsers user = rfUsersService.selectUsersByUserId(request.getUserId());
+                if(user != null && user.getEmail() != null && !user.getEmail().isEmpty()){
+                    mailService.sendRefundApprovedEmail(user.getEmail(), user.getUsername(),
+                            request.getRequestNumber(), request.getAmount());
+                }
             }
 
-            return refundTransactionsMapper.addRefundTransactions(refundTransactionsList);
+            return result;
         }
+
+        // 状态2：审批拒绝，发送拒绝邮件
+        if(status == 2){
+            for(Long requestId : requestIds){
+                RefundRequests request = refundRequestsMapper.selectRefundRequestsByRequestId(requestId);
+                RfUsers user = rfUsersService.selectUsersByUserId(request.getUserId());
+                if(user != null && user.getEmail() != null && !user.getEmail().isEmpty()){
+                    mailService.sendRefundRejectedEmail(user.getEmail(), user.getUsername(),
+                            request.getRequestNumber(), rejectReason);
+                }
+            }
+        }
+
+        // 状态5：交易失败，发送交易失败邮件
+        if(status == 5){
+            for(Long requestId : requestIds){
+                RefundRequests request = refundRequestsMapper.selectRefundRequestsByRequestId(requestId);
+                RfUsers user = rfUsersService.selectUsersByUserId(request.getUserId());
+                if(user != null && user.getEmail() != null && !user.getEmail().isEmpty()){
+                    mailService.sendTransactionFailedEmail(user.getEmail(), user.getUsername(),
+                            request.getRequestNumber(), rejectReason);
+                }
+            }
+        }
+
         return result;
     }
 }

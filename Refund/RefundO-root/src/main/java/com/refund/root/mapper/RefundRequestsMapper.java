@@ -69,4 +69,19 @@ public interface RefundRequestsMapper
      * @param status 状态
      * */
     int updateRefundRequestsStatus(@Param("requestIds") Long[] requestIds, @Param("status") Long status,@Param("rejectReason") String rejectReason,@Param("adminId") Long adminId);
+
+    /**
+     * 查询指定状态的退款请求列表（用于定时任务处理）
+     * @param status 状态
+     * @return 退款请求列表
+     */
+    List<RefundRequests> selectRefundRequestsByStatus(@Param("status") Long status);
+
+    /**
+     * 批量更新退款请求状态（用于定时任务）
+     * @param requestIds 请求ID数组
+     * @param status 目标状态
+     * @return 影响行数
+     */
+    int batchUpdateRequestStatus(@Param("requestIds") Long[] requestIds, @Param("status") Long status);
 }

@@ -18,7 +18,7 @@ ruoyi:
 # APK文件上传配置
 apk:
   # APK访问域名
-  domain: https://www.zoustarfall.xin
+  domain: https://120.26.110.204
 
 # 开发环境配置
 server:
@@ -58,6 +58,26 @@ spring:
   messages:
     # 国际化资源文件路径
     basename: i18n/messages
+  # 邮件配置
+  mail:
+    host: smtp.qq.com
+    port: 587
+    username: 1824109129@qq.com
+    password: mdotctsxusxhbeih
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+          ssl:
+            protocols: TLSv1.2
+            trust: smtp.qq.com
+            checkserveridentity: false
+          connectiontimeout: 10000
+          timeout: 10000
+          writetimeout: 10000
+    default-encoding: UTF-8
   profiles:
     active: druid
   # 文件上传

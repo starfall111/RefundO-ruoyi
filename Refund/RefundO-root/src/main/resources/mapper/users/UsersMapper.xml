@@ -106,9 +106,25 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </delete>
 
     <delete id="deleteUsersByUserIds" parameterType="String">
-        delete from rf_users where user_id in 
+        delete from rf_users where user_id in
         <foreach item="userId" collection="array" open="(" separator="," close=")">
             #{userId}
         </foreach>
     </delete>
+
+    <!-- 原子化增加余额（通过请求状态校验实现幂等性） -->
+    <update id="increaseBalanceWithRequestCheck">
+        UPDATE rf_users
+        SET balance = balance + #{amount}
+        WHERE user_id = #{userId}
+          AND EXISTS (
+              SELECT 1 FROM refund_requests
+              WHERE request_id = #{requestId}
+                AND user_id = #{userId}
+                AND request_status IN
+              <foreach collection="allowedStatuses" item="status" open="(" separator="," close=")">
+                  #{status}
+              </foreach>
+          )
+    </update>
 </mapper>

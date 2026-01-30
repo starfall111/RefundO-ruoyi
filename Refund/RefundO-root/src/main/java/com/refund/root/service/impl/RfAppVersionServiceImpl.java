@@ -20,6 +20,8 @@ public class RfAppVersionServiceImpl implements IRfAppVersionService
     @Autowired
     private RfAppVersionMapper rfAppVersionMapper;
 
+    private final static String APK_PATH = "/apk/";
+
     /**
      * 查询version_controller
      * 
@@ -54,7 +56,11 @@ public class RfAppVersionServiceImpl implements IRfAppVersionService
     public int insertRfAppVersion(RfAppVersion rfAppVersion)
     {
         String path = rfAppVersion.getDownloadUrl();
-        rfAppVersion.setApkMd5(ApkMd5Utils.getFileMD5(path));
+//        提取文件名
+        String fileName = path.substring(path.lastIndexOf("/") + 1);
+        path = APK_PATH + fileName;
+        String apkMd5 = ApkMd5Utils.calculateFileMd5(path);
+        rfAppVersion.setApkMd5(apkMd5);
         return rfAppVersionMapper.insertRfAppVersion(rfAppVersion);
     }
 

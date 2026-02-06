@@ -19,6 +19,11 @@ import com.refund.common.exception.ServiceException;
 import com.refund.common.utils.MessageUtils;
 import com.refund.common.utils.StringUtils;
 import com.refund.common.utils.html.EscapeUtil;
+import com.refund.common.exception.business.*;
+import com.refund.common.core.domain.Result;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * 全局异常处理器
@@ -28,10 +33,13 @@ import com.refund.common.utils.html.EscapeUtil;
 @RestControllerAdvice
 public class GlobalExceptionHandler
 {
-    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+    public static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
+    @Autowired
+    private MessageSource messageSource;
 
     /**
-     * 权限校验异常
+     * 权限校验异常（管理端）
      */
     @ExceptionHandler(AccessDeniedException.class)
     public AjaxResult handleAccessDeniedException(AccessDeniedException e, HttpServletRequest request)
@@ -142,5 +150,64 @@ public class GlobalExceptionHandler
     public AjaxResult handleDemoModeException(DemoModeException e)
     {
         return AjaxResult.error(MessageUtils.message("exception.demo_mode"));
+    }
+
+    // ==================== APP端异常处理 ====================
+
+    /**
+     * APP端基础异常处理
+     */
+    @ExceptionHandler(BaseException.class)
+    public Result<Void> handleBaseException(BaseException e, HttpServletRequest request)
+    {
+        String requestURI = request.getRequestURI();
+        // 只处理APP端请求
+        if (!requestURI.startsWith("/api/")) {
+            return null;
+        }
+
+        log.error("APP端请求地址'{}',发生业务异常: {}", requestURI, e.getMessage());
+
+        // 如果启用了国际化，从资源文件中获取消息
+        if (e.isI18nEnabled()) {
+            String message = getI18nMessage(e.getMessageKey(), e.getArgs());
+            return Result.error(message);
+        }
+
+        return Result.error(e.getMessage());
+    }
+
+    /**
+     * APP端限流异常
+     */
+    @ExceptionHandler(RateLimitException.class)
+    public Result<Void> handleRateLimitException(RateLimitException e, HttpServletRequest request)
+    {
+        String requestURI = request.getRequestURI();
+        if (!requestURI.startsWith("/api/")) {
+            return null;
+        }
+
+        log.warn("APP端请求地址'{}',触发限流: {}", requestURI, e.getMessageKey());
+
+        String message = getI18nMessage(e.getMessageKey(), e.getArgs());
+        return Result.error(message);
+    }
+
+    /**
+     * 获取国际化消息
+     */
+    private String getI18nMessage(String messageKey, Object[] args) {
+        try {
+            java.util.Locale locale = LocaleContextHolder.getLocale();
+            if (args != null && args.length > 0) {
+                return messageSource.getMessage(messageKey, args, locale);
+            } else {
+                return messageSource.getMessage(messageKey, null, locale);
+            }
+        } catch (Exception ex) {
+            log.warn("获取国际化消息失败: {}", messageKey);
+            return messageKey;
+        }
     }
 }

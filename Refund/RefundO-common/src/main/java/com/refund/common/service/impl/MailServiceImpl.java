@@ -2,6 +2,7 @@ package com.refund.common.service.impl;
 
 import com.refund.common.core.domain.EmailTemplate;
 import com.refund.common.service.IMailService;
+import com.refund.common.utils.ApiMessageUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.Locale;
 
 /**
  * 邮件服务实现
@@ -28,6 +30,9 @@ public class MailServiceImpl implements IMailService {
 
     @Value("${spring.mail.username}")
     private String fromEmail;
+
+    @Value("${verification.code.expire-minutes:3}")
+    private int defaultExpireMinutes;
 
     /**
      * 发送退款审批通过邮件
@@ -90,6 +95,49 @@ public class MailServiceImpl implements IMailService {
         template.setContent(content);
 
         sendEmailAsync(template);
+    }
+
+    /**
+     * 发送验证码邮件
+     */
+    @Override
+    public void sendVerificationCodeEmail(String toEmail, String verificationCode, Locale locale) {
+        sendVerificationCodeEmailAsync(toEmail, verificationCode, locale);
+    }
+
+    /**
+     * 异步发送验证码邮件
+     */
+    @Async("mailExecutor")
+    @Override
+    public void sendVerificationCodeEmailAsync(String toEmail, String verificationCode, Locale locale) {
+        try {
+            EmailTemplate template = new EmailTemplate();
+            template.setToEmail(toEmail);
+            template.setVerificationCode(verificationCode);
+            template.setExpireMinutes(defaultExpireMinutes);
+            template.setTemplateType(3);
+
+            // 使用传入的 locale 获取国际化邮件主题和内容
+            String subject = ApiMessageUtils.getMessage("email.verification.subject", locale);
+            String content = ApiMessageUtils.getMessage("email.verification.content", locale,
+                    new Object[]{verificationCode, defaultExpireMinutes});
+
+            template.setSubject(subject);
+            template.setContent(content);
+
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setFrom(fromEmail);
+            message.setTo(toEmail);
+            message.setSubject(subject);
+            message.setText(content);
+
+            mailSender.send(message);
+            log.info("Verification code email sent successfully to: {}, expire minutes: {}, locale: {}",
+                    toEmail, defaultExpireMinutes, locale);
+        } catch (Exception e) {
+            log.error("Failed to send verification code email to: {}, error: {}", toEmail, e.getMessage(), e);
+        }
     }
 
     /**

@@ -86,9 +86,17 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </delete>
 
     <delete id="deleteRefundTransactionsByTransIds" parameterType="String">
-        delete from refund_transactions where trans_id in 
+        delete from refund_transactions where trans_id in
         <foreach item="transId" collection="array" open="(" separator="," close=")">
             #{transId}
         </foreach>
     </delete>
+
+    <!-- ==================== APP端专用方法 ==================== -->
+
+    <!-- 根据退款请求ID查询交易记录 -->
+    <select id="selectByRequestId" parameterType="Long" resultMap="RefundTransactionsResult">
+        <include refid="selectRefundTransactionsVo"/>
+        where refund_transactions.request_id = #{requestId}
+    </select>
 </mapper>

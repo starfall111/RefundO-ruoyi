@@ -61,7 +61,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="sangke != null">#{sangke},</if>
             <if test="wave != null">#{wave},</if>
             <if test="password != null">#{password},</if>
-            <if test="createTime != null">#{createTime},</if>
+            <if test="createTime != null">NOW(),</if>
             <if test="bansCount != null">#{bansCount},</if>
          </trim>
     </insert>
@@ -126,5 +126,29 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                   #{status}
               </foreach>
           )
+    </update>
+
+    <!-- ==================== APP端专用方法 ==================== -->
+
+    <select id="loginByNameOrEmail" resultMap="UsersResult">
+        select * from rf_users
+        <where>
+            <if test="userName!= null">username = #{userName}</if>
+            <if test="email!= null">or email = #{email}</if>
+        </where>
+    </select>
+
+    <!-- 原子性增加用户余额（扫描时使用） -->
+    <update id="addBalance">
+        UPDATE rf_users
+        SET balance = balance + #{amount}
+        WHERE user_id = #{userId}
+    </update>
+
+    <!-- 原子性扣减用户余额（退款申请时使用） -->
+    <update id="subtractBalance">
+        UPDATE rf_users
+        SET balance = balance - #{amount}
+        WHERE user_id = #{userId} AND balance >= #{amount}
     </update>
 </mapper>

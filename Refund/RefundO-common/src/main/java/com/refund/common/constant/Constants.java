@@ -111,6 +111,16 @@ public class Constants
     public static final String LOGIN_USER_KEY = "login_user_key";
 
     /**
+     * APP端登录用户 Key
+     */
+    public static final String API_LOGIN_USER_KEY = "api_login_user_key";
+
+    /**
+     * APP端登录令牌 Redis Key 前缀
+     */
+    public static final String API_LOGIN_TOKEN_KEY = "api_login_tokens:";
+
+    /**
      * 用户ID
      */
     public static final String JWT_USERID = "userid";

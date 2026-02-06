@@ -48,9 +48,19 @@ public class EmailTemplate implements Serializable {
     private String rejectReason;
 
     /**
-     * 模板类型 (1:审批通过, 2:审批拒绝, 5:交易失败)
+     * 模板类型 (1:审批通过, 2:审批拒绝, 3:验证码, 4:密码重置, 5:交易失败)
      */
     private Integer templateType;
+
+    /**
+     * 验证码
+     */
+    private String verificationCode;
+
+    /**
+     * 过期时间（分钟）
+     */
+    private Integer expireMinutes;
 
     public String getToEmail() {
         return toEmail;
@@ -114,5 +124,21 @@ public class EmailTemplate implements Serializable {
 
     public void setTemplateType(Integer templateType) {
         this.templateType = templateType;
+    }
+
+    public String getVerificationCode() {
+        return verificationCode;
+    }
+
+    public void setVerificationCode(String verificationCode) {
+        this.verificationCode = verificationCode;
+    }
+
+    public Integer getExpireMinutes() {
+        return expireMinutes;
+    }
+
+    public void setExpireMinutes(Integer expireMinutes) {
+        this.expireMinutes = expireMinutes;
     }
 }

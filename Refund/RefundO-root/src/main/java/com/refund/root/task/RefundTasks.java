@@ -36,7 +36,7 @@ public class RefundTasks {
      * 定时创建退款交易记录
      * 每分钟执行一次，处理状态为1（审批通过待创建交易）的退款请求
      */
-    @Scheduled(cron = "0 * * * * ?")
+    @Scheduled(cron = "0 0 * * * ?")
     public void createRefundTransactions() {
         try {
             log.info("开始执行退款交易创建定时任务，时间: {}", DateUtils.getNowDate());

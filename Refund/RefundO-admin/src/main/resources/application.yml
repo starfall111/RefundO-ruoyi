@@ -122,6 +122,50 @@ token:
   # 令牌有效期（默认30分钟）
   expireTime: 30
 
+# ========== APP端 Token配置 ==========
+api:
+  token:
+    # 令牌自定义标识
+    header: Authorization
+    # 令牌密钥
+    secret: abcdefghijklmnopqrstuvwxyz1234567890app
+    # 令牌有效期（默认24小时，单位：分钟）
+    expireTime: 1440
+  # ========== 验证码配置 ==========
+  verification:
+    code:
+      # 验证码过期时间（分钟）
+      expireMinutes: 3
+      # 验证码长度
+      length: 6
+  # ========== 限流配置 ==========
+  rate:
+    limit:
+      # 是否启用限流
+      enabled: true
+      # IP限流配置
+      ip:
+        # 时间窗口（秒）
+        time: 60
+        # 最大请求数
+        count: 100
+      # 登录限流配置
+      login:
+        # 时间窗口（秒）
+        time: 300
+        # 最大请求数
+        count: 10
+        # 失败阈值
+        failThreshold: 5
+        # 锁定时长（分钟）
+        lockDuration: 30
+      # 验证码限流配置
+      code:
+        # 时间窗口（秒）
+        time: 60
+        # 最大请求数
+        count: 5
+
 # MyBatis配置
 mybatis:
   # 搜索指定包别名

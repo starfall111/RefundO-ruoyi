@@ -47,8 +47,12 @@ public class HeaderLocaleResolver implements LocaleResolver
             return Constants.DEFAULT_LOCALE;
         }
 
+        // 检查是否为APP端请求，如果是则支持法语
+        String requestURI = request.getRequestURI();
+        boolean isApiRequest = requestURI != null && requestURI.startsWith("/api/");
+
         // 解析 Accept-Language 头，按优先级排序
-        return parseAcceptLanguage(language);
+        return parseAcceptLanguage(language, isApiRequest);
     }
 
     /**
@@ -56,9 +60,10 @@ public class HeaderLocaleResolver implements LocaleResolver
      * 按照 HTTP 规范解析，支持优先级 q 值
      *
      * @param acceptLanguage Accept-Language 头的值
+     * @param supportFrench 是否支持法语（APP端）
      * @return 解析后的Locale对象
      */
-    private Locale parseAcceptLanguage(String acceptLanguage)
+    private Locale parseAcceptLanguage(String acceptLanguage, boolean supportFrench)
     {
         // 按逗号分割各个语言项
         String[] languageTokens = acceptLanguage.split(",");
@@ -88,7 +93,7 @@ public class HeaderLocaleResolver implements LocaleResolver
 
             // 检查是否支持该语言
             String languageLower = language.toLowerCase();
-            if (isSupportedLanguage(languageLower))
+            if (isSupportedLanguage(languageLower, supportFrench))
             {
                 if (quality > bestQuality)
                 {
@@ -113,6 +118,10 @@ public class HeaderLocaleResolver implements LocaleResolver
             {
                 return Locale.ENGLISH;
             }
+            else if (supportFrench && bestLanguage.contains("fr"))
+            {
+                return Locale.FRANCE;
+            }
         }
 
         // 默认返回中文
@@ -123,13 +132,20 @@ public class HeaderLocaleResolver implements LocaleResolver
      * 检查是否支持该语言
      *
      * @param language 语言标识（应该是小写的）
+     * @param supportFrench 是否支持法语
      * @return 是否支持
      */
-    private boolean isSupportedLanguage(String language)
+    private boolean isSupportedLanguage(String language, boolean supportFrench)
     {
-        return language.contains("zh-cn") || language.contains("zh_cn") ||
+        boolean isSupported = language.contains("zh-cn") || language.contains("zh_cn") ||
                 language.contains("zh-tw") || language.contains("zh_tw") ||
                 language.contains("en");
+
+        if (supportFrench) {
+            isSupported = isSupported || language.contains("fr");
+        }
+
+        return isSupported;
     }
 
     /**

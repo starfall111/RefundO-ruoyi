@@ -84,4 +84,35 @@ public interface RfUsersMapper
                                          @Param("amount") BigDecimal amount,
                                          @Param("requestId") Long requestId,
                                          @Param("allowedStatuses") List<Long> allowedStatuses);
+
+    // ==================== APP端专用方法 ====================
+
+    /**
+     * 原子性增加用户余额（扫描时使用，线程安全）
+     * 用于扫描产品后增加用户余额
+     *
+     * @param userId 用户ID
+     * @param amount 增加金额
+     * @return 影响行数
+     */
+    int addBalance(@Param("userId") Long userId, @Param("amount") BigDecimal amount);
+
+    /**
+     * 原子性扣减用户余额（退款申请时使用，线程安全）
+     * 只有余额足够时才会扣减
+     *
+     * @param userId 用户ID
+     * @param amount 扣减金额
+     * @return 影响行数，0表示余额不足
+     */
+    int subtractBalance(@Param("userId") Long userId, @Param("amount") BigDecimal amount);
+
+    /**
+     * 根据用户名或邮箱登录
+     *
+     * @param userName 用户名
+     * @param email 邮箱
+     * @return 用户信息
+     */
+    RfUsers loginByNameOrEmail(@Param("userName") String userName, @Param("email") String email);
 }

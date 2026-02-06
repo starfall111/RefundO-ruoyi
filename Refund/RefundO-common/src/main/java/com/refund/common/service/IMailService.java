@@ -3,6 +3,7 @@ package com.refund.common.service;
 import com.refund.common.core.domain.EmailTemplate;
 
 import java.math.BigDecimal;
+import java.util.Locale;
 
 /**
  * 邮件服务接口
@@ -47,4 +48,22 @@ public interface IMailService {
      * @param template 邮件模板
      */
     void sendEmailAsync(EmailTemplate template);
+
+    /**
+     * 发送验证码邮件
+     *
+     * @param toEmail 收件人邮箱
+     * @param verificationCode 验证码
+     * @param locale 国际化Locale
+     */
+    void sendVerificationCodeEmail(String toEmail, String verificationCode, Locale locale);
+
+    /**
+     * 异步发送验证码邮件
+     *
+     * @param toEmail 收件人邮箱
+     * @param verificationCode 验证码
+     * @param locale 国际化Locale
+     */
+    void sendVerificationCodeEmailAsync(String toEmail, String verificationCode, Locale locale);
 }

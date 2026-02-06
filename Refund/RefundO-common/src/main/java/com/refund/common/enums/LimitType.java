@@ -5,7 +5,6 @@ package com.refund.common.enums;
  *
  * @author ruoyi
  */
-
 public enum LimitType
 {
     /**
@@ -16,5 +15,17 @@ public enum LimitType
     /**
      * 根据请求者IP进行限流
      */
-    IP
+    IP,
+
+    /**
+     * 按用户ID限流
+     * 适用于已登录用户的接口
+     */
+    USER,
+
+    /**
+     * 全局限流
+     * 适用于保护整个系统
+     */
+    GLOBAL
 }

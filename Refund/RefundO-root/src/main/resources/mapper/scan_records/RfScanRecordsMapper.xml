@@ -75,9 +75,44 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </delete>
 
     <delete id="deleteRfScanRecordsByScanIds" parameterType="String">
-        delete from rf_scan_records where scan_id in 
+        delete from rf_scan_records where scan_id in
         <foreach item="scanId" collection="array" open="(" separator="," close=")">
             #{scanId}
         </foreach>
     </delete>
+
+    <!-- ==================== APP端专用方法 ==================== -->
+
+    <!-- 根据用户ID分页查询扫描记录（含产品信息） -->
+    <select id="findByUserIdWithProduct" resultType="com.refund.common.core.domain.vo.ScanRecordsVO">
+        SELECT
+            s.scan_id AS scanId,
+            s.scan_number AS scanNumber,
+            s.user_id AS userId,
+            s.product_id AS productId,
+            s.scan_time AS scanTime,
+            p.refund_ratio AS refundRatio,
+            p.value AS value,
+            p.original_price AS originalPrice,
+            s.refund_status AS refundStatus
+        FROM rf_scan_records s
+        LEFT JOIN rf_products p ON s.product_id = p.product_id
+        WHERE s.user_id = #{userId}
+        ORDER BY
+            <choose>
+                <when test="orderBy == 'amount'">
+                    p.value ${orderDirection}
+                </when>
+                <otherwise>
+                    s.scan_time ${orderDirection}
+                </otherwise>
+            </choose>
+    </select>
+
+    <!-- 原子性更新退款状态（仅当status=0时更新） -->
+    <update id="updateRefundStatusIfNotApplied">
+        UPDATE rf_scan_records
+        SET refund_status = 1
+        WHERE scan_id = #{scanId} AND refund_status = 0
+    </update>
 </mapper>

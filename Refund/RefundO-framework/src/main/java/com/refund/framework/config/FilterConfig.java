@@ -13,6 +13,8 @@ import com.refund.common.filter.RefererFilter;
 import com.refund.common.filter.RepeatableFilter;
 import com.refund.common.filter.XssFilter;
 import com.refund.common.utils.StringUtils;
+import com.refund.framework.security.filter.LocaleFilter;
+import com.refund.framework.security.filter.RateLimitFilter;
 
 /**
  * Filter配置
@@ -74,6 +76,38 @@ public class FilterConfig
         registration.addUrlPatterns("/*");
         registration.setName("repeatableFilter");
         registration.setOrder(FilterRegistrationBean.LOWEST_PRECEDENCE);
+        return registration;
+    }
+
+    /**
+     * 注册APP端语言环境过滤器
+     * Order=1，最先执行
+     */
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @Bean
+    public FilterRegistrationBean localeFilterRegistration()
+    {
+        FilterRegistrationBean registration = new FilterRegistrationBean();
+        registration.setFilter(new LocaleFilter());
+        registration.addUrlPatterns("/api/*");
+        registration.setName("localeFilter");
+        registration.setOrder(1);
+        return registration;
+    }
+
+    /**
+     * 注册APP端限流过滤器
+     * Order=2，在LocaleFilter之后执行
+     */
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @Bean
+    public FilterRegistrationBean rateLimitFilterRegistration()
+    {
+        FilterRegistrationBean registration = new FilterRegistrationBean();
+        registration.setFilter(new RateLimitFilter());
+        registration.addUrlPatterns("/api/*");
+        registration.setName("rateLimitFilter");
+        registration.setOrder(2);
         return registration;
     }
 

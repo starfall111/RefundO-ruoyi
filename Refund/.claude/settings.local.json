@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find:*)",
+      "Bash(tree:*)",
+      "Bash(mvn compile:*)",
+      "Bash(mvn clean compile:*)",
+      "Bash(mvn spring-boot:run:*)",
+      "Bash(mvn clean package:*)",
+      "Bash(java -jar:*)",
+      "WebSearch"
+    ]
+  }
+}

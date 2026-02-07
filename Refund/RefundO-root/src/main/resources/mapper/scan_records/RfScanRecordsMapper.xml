@@ -97,7 +97,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             s.refund_status AS refundStatus
         FROM rf_scan_records s
         LEFT JOIN rf_products p ON s.product_id = p.product_id
-        WHERE s.user_id = #{userId}
+        WHERE s.user_id = #{userId} AND s.refund_status = 0
         ORDER BY
             <choose>
                 <when test="orderBy == 'amount'">
@@ -113,6 +113,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <update id="updateRefundStatusIfNotApplied">
         UPDATE rf_scan_records
         SET refund_status = 1
-        WHERE scan_id = #{scanId} AND refund_status = 0
+        WHERE scan_id in
+        <foreach item="scanId" collection="scanIds" open="(" separator="," close=")">
+            #{scanId}
+        </foreach>
     </update>
 </mapper>

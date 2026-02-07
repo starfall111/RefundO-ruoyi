@@ -69,6 +69,7 @@
             <if test="rejectReason != null">reject_reason,</if>
             <if test="userId != null">user_id,</if>
             <if test="adminId != null">admin_id,</if>
+            <if test="scanIds != null" >scan_ids,</if>
             <if test="paymentMethod != null">payment_method,</if>
             <if test="paymentNumber != null">payment_number,</if>
             <if test="requestNumber != null">request_number,</if>
@@ -82,6 +83,7 @@
             <if test="rejectReason != null">#{rejectReason},</if>
             <if test="userId != null">#{userId},</if>
             <if test="adminId != null">#{adminId},</if>
+            <if test="scanIds != null">#{scanIds},</if>
             <if test="paymentMethod != null">#{paymentMethod},</if>
             <if test="paymentNumber != null">#{paymentNumber},</if>
             <if test="requestNumber != null">#{requestNumber},</if>

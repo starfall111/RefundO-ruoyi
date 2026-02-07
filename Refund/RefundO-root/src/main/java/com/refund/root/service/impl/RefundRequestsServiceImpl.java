@@ -300,27 +300,28 @@ public class RefundRequestsServiceImpl implements IRefundRequestsService {
                     throw new RefundRequestStatusException(MessageKeys.REFUND_SCAN_NOT_EXIST);
                 }
 
-                // 3. 原子性检查并更新退款状态
-                int updated = scanRecordsMapper.updateRefundStatusIfNotApplied(scanId);
-                if (updated == 0) {
-                    // 记录违规行为
-                    recordIllegalActivity("申请退款时发现扫描记录已申请退款: " + scanId, userId);
-                    throw new RefundRequestStatusException(MessageKeys.REFUND_SCAN_ALREADY_APPLIED);
-                }
-
-                // 4. 检查日期是否满5个月
+                // 3. 检查日期是否满5个月
                 LocalDateTime scanTime = scan.getScanTime().toInstant()
                         .atZone(ZoneId.systemDefault()).toLocalDateTime();
                 if (scanTime.plusMonths(5).isAfter(LocalDateTime.now())) {
                     throw new RefundRequestStatusException(MessageKeys.REFUND_SCAN_NOT_ELIGIBLE);
                 }
 
-                // 5. 获取产品信息计算金额
+                // 4. 获取产品信息计算金额
                 Product product = productsMapper.selectById(scan.getProductId());
                 if (product == null) {
                     throw new RefundRequestStatusException(MessageKeys.PRODUCT_NOT_EXIST);
                 }
                 totalAmount = totalAmount.add(product.getValue());
+
+                // 5. 检查扫描记录状态是否合法
+                RfScanRecords scanRecord = scanRecordsMapper.selectRfScanRecordsByScanId(scanId);
+                if (scanRecord.getRefundStatus() == 1) {
+                    // 记录违规行为
+                    recordIllegalActivity("申请退款时发现扫描记录已申请退款: " + scanId, userId);
+                    throw new RefundRequestStatusException(MessageKeys.REFUND_SCAN_ALREADY_APPLIED);
+                }
+
             }
 
             // 6. 检查总金额是否≥5000
@@ -328,10 +329,13 @@ public class RefundRequestsServiceImpl implements IRefundRequestsService {
                 throw new RefundRequestStatusException(MessageKeys.REFUND_AMOUNT_INSUFFICIENT);
             }
 
-            // 7. 生成请求编号
+            // 7. 批量修改订单状态
+            int result = scanRecordsMapper.updateRefundStatusIfNotApplied(scanIds);
+
+            // 8. 生成请求编号
             String requestNumber = numberGenUtils.genRequestNumber();
 
-            // 8. 创建退款请求
+            // 9. 创建退款请求
             RefundRequests request = new RefundRequests();
             request.setRequestNumber(requestNumber);
             request.setUserId(userId);
@@ -344,7 +348,7 @@ public class RefundRequestsServiceImpl implements IRefundRequestsService {
             request.setCreateTime(new Date());
             refundRequestsMapper.insertRefundRequests(request);
 
-            // 9. 原子性扣减用户余额
+            // 10. 原子性扣减用户余额
             int balanceUpdated = usersMapper.subtractBalance(userId, totalAmount);
             if (balanceUpdated == 0) {
                 throw new RefundRequestStatusException("余额不足");

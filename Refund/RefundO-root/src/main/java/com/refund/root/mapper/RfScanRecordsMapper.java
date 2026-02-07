@@ -81,8 +81,9 @@ public interface RfScanRecordsMapper {
     /**
      * 原子性更新退款状态（仅当status=0时更新）
      *
-     * @param scanId 扫描ID
+     * @param scanIds 扫描ID组
      * @return 影响行数，0表示未更新（已申请退款）
      */
-    int updateRefundStatusIfNotApplied(@Param("scanId") Long scanId);
+    int updateRefundStatusIfNotApplied(@Param("scanIds") List<Long> scanIds);
+
 }

@@ -1,6 +1,7 @@
 package com.refund.root.controller.api;
 
 import com.refund.common.core.domain.Result;
+import com.refund.common.exception.business.ResourceNotFoundException;
 import com.refund.root.domain.RfFaqs;
 import com.refund.root.service.IRfFaqsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,12 +58,14 @@ public class AppFAQController {
     public Result<RfFaqs> getFAQById(@PathVariable Long id) {
         RfFaqs faq = rfFaqsService.selectRfFaqsById(id);
 
-        // 增加浏览次数
-        if (faq != null) {
-            Long viewCount = faq.getViewCount();
-            faq.setViewCount(viewCount == null ? 1L : viewCount + 1);
-            rfFaqsService.updateRfFaqs(faq);
+        if (faq == null) {
+            throw new ResourceNotFoundException("FAQ not found: " + id);
         }
+
+        // 增加浏览次数
+        Long viewCount = faq.getViewCount();
+        faq.setViewCount(viewCount == null ? 1L : viewCount + 1);
+        rfFaqsService.updateRfFaqs(faq);
 
         return Result.success(faq);
     }

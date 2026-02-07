@@ -149,7 +149,8 @@ public class RateLimitFilter extends OncePerRequestFilter implements Ordered {
     }
 
     /**
-     * 获取客户端真实IP
+     * 获取客户端IP地址
+     * 只使用request.getRemoteAddr()，不读取反向代理请求头（防止IP伪造）
      */
     private String getClientIP(HttpServletRequest request) {
         try {
@@ -158,25 +159,6 @@ public class RateLimitFilter extends OncePerRequestFilter implements Ordered {
             // 处理IPv6本地地址
             if ("0:0:0:0:0:0:0:1".equals(ip) || "::1".equals(ip)) {
                 ip = "127.0.0.1";
-            }
-
-            // 检查反向代理传递的IP（X-Forwarded-For）
-            String xForwardedFor = request.getHeader("X-Forwarded-For");
-            if (xForwardedFor != null && !xForwardedFor.isEmpty() && !"unknown".equalsIgnoreCase(xForwardedFor)) {
-                // X-Forwarded-For格式: clientIP, proxy1IP, proxy2IP
-                // 取第一个IP作为真实客户端IP
-                int index = xForwardedFor.indexOf(',');
-                if (index != -1) {
-                    ip = xForwardedFor.substring(0, index).trim();
-                } else {
-                    ip = xForwardedFor.trim();
-                }
-            } else {
-                // 只有在没有 X-Forwarded-For 时才检查 X-Real-IP（某些反向代理使用）
-                String xRealIp = request.getHeader("X-Real-IP");
-                if (xRealIp != null && !xRealIp.isEmpty() && !"unknown".equalsIgnoreCase(xRealIp)) {
-                    ip = xRealIp.trim();
-                }
             }
 
             return ip != null ? ip : "unknown";

@@ -1,6 +1,7 @@
 package com.refund.root.controller.api;
 
 import com.refund.common.core.domain.Result;
+import com.refund.common.exception.business.ResourceNotFoundException;
 import com.refund.root.domain.RfFaqCategories;
 import com.refund.root.service.IRfFaqCategoriesService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +41,11 @@ public class AppFAQCategoryController {
     @GetMapping("/{id}")
     public Result<RfFaqCategories> getCategoryById(@PathVariable Long id) {
         RfFaqCategories category = rfFaqCategoriesService.selectRfFaqCategoriesById(id);
+
+        if (category == null) {
+            throw new ResourceNotFoundException("FAQ category not found: " + id);
+        }
+
         return Result.success(category);
     }
 

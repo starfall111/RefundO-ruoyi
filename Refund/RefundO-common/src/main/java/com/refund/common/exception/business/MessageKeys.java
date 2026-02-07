@@ -19,6 +19,12 @@ public final class MessageKeys {
     public static final String ACCOUNT_STATUS_FROZEN = "error.account.status.frozen";
     public static final String LOGIN_IP_LOCKED = "error.login.ip.locked";
     public static final String LOGIN_ACCOUNT_LOCKED = "error.login.account.locked";
+    // 密码错误，剩余N次机会
+    public static final String LOGIN_PASSWORD_REMAINING_ATTEMPTS = "error.login.password.remaining.attempts";
+    // IP锁定，将于 HH:mm 解锁
+    public static final String LOGIN_IP_LOCKED_UNTIL = "error.login.ip.locked.until";
+    // 账号锁定，将于 HH:mm 解锁
+    public static final String LOGIN_ACCOUNT_LOCKED_UNTIL = "error.login.account.locked.until";
 
     // ==================== 密码相关 (2000-2999) ====================
     public static final String PASSWORD_INCORRECT = "error.password.incorrect";
@@ -39,6 +45,10 @@ public final class MessageKeys {
     public static final String REFUND_SCAN_ALREADY_APPLIED = "error.refund.scan.already.applied";
     public static final String REFUND_SCAN_NOT_ELIGIBLE = "error.refund.scan.not.eligible";
     public static final String REFUND_AMOUNT_INSUFFICIENT = "error.refund.amount.insufficient";
+    public static final String REFUND_BALANCE_INSUFFICIENT = "error.refund.balance.insufficient";
+
+    // ==================== 余额相关 (5500-5599) ====================
+    public static final String BALANCE_INSUFFICIENT = "error.balance.insufficient";
 
     // ==================== 服务器相关 (6000-6999) ====================
     public static final String SERVER_INTERNAL = "error.server.internal";
@@ -54,6 +64,9 @@ public final class MessageKeys {
 
     // ==================== 通用 (9000-9999) ====================
     public static final String VALIDATION_INVALID = "error.validation.invalid";
+    public static final String PARAM_INVALID = "error.param.invalid";
+    public static final String PARAM_SCAN_IDS_EMPTY = "error.param.scan_ids.empty";
+    public static final String PARAM_SCAN_IDS_INVALID = "error.param.scan_ids.invalid";
 
     // ==================== 限流相关 (10000-10999) ====================
     public static final String RATE_LIMIT_EXCEEDED = "error.rate.limit.exceeded";

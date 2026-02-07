@@ -15,9 +15,11 @@ import com.refund.common.core.domain.dto.PageQueryDTO;
 import com.refund.common.core.domain.dto.RefundRequestDTO;
 import com.refund.common.core.domain.model.LoginUser;
 import com.refund.common.core.domain.vo.TransactionVO;
+import com.refund.common.exception.business.AccountStatusErrorException;
 import com.refund.common.exception.business.MessageKeys;
 import com.refund.common.exception.business.RefundRequestStatusException;
 import com.refund.common.exception.business.ResourceNotFoundException;
+import com.refund.common.exception.business.ValidationException;
 import com.refund.common.service.IMailService;
 import com.refund.common.utils.DateUtils;
 import com.refund.common.utils.SecurityUtils;
@@ -351,7 +353,7 @@ public class RefundRequestsServiceImpl implements IRefundRequestsService {
             // 10. 原子性扣减用户余额
             int balanceUpdated = usersMapper.subtractBalance(userId, totalAmount);
             if (balanceUpdated == 0) {
-                throw new RefundRequestStatusException("余额不足");
+                throw new RefundRequestStatusException(MessageKeys.BALANCE_INSUFFICIENT);
             }
 
             log.info("退款请求创建成功: userId={}, requestNumber={}, amount={}",
@@ -360,7 +362,7 @@ public class RefundRequestsServiceImpl implements IRefundRequestsService {
             throw e;
         } catch (Exception e) {
             log.error("创建退款请求时发生错误: {}", e.getMessage(), e);
-            throw new RuntimeException("创建退款请求失败", e);
+            throw new AccountStatusErrorException(MessageKeys.SERVER_UPDATE_FAILED);
         }
     }
 
@@ -428,7 +430,7 @@ public class RefundRequestsServiceImpl implements IRefundRequestsService {
      */
     private List<Long> parseScanIds(String scanIdsStr) {
         if (scanIdsStr == null || scanIdsStr.trim().isEmpty()) {
-            throw new RefundRequestStatusException("扫描ID不能为空");
+            throw new ValidationException(MessageKeys.PARAM_SCAN_IDS_EMPTY, "A0002");
         }
         return Arrays.stream(scanIdsStr.split(","))
                 .map(String::trim)

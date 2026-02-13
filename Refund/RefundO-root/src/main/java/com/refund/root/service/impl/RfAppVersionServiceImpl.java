@@ -99,4 +99,14 @@ public class RfAppVersionServiceImpl implements IRfAppVersionService
     {
         return rfAppVersionMapper.deleteRfAppVersionByVersionId(versionId);
     }
+
+    /**
+     * 获取最新版本信息
+     *
+     * @return 最新版本信息
+     */
+    @Override
+    public RfAppVersion update() {
+        return rfAppVersionMapper.update();
+    }
 }

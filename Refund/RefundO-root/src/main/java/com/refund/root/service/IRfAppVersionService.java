@@ -58,4 +58,11 @@ public interface IRfAppVersionService
      * @return 结果
      */
     public int deleteRfAppVersionByVersionId(Long versionId);
+
+    /**
+     * 获取最新版本信息
+     *
+     * @return
+     */
+    RfAppVersion update();
 }

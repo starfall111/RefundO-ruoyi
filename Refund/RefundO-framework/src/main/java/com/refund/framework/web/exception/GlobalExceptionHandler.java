@@ -24,6 +24,7 @@ import com.refund.common.core.domain.Result;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 /**
  * 全局异常处理器
@@ -36,6 +37,7 @@ public class GlobalExceptionHandler
     public static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @Autowired
+    @Qualifier("apiMessageSource")
     private MessageSource messageSource;
 
     /**
@@ -200,12 +202,10 @@ public class GlobalExceptionHandler
     private String getI18nMessage(String messageKey, Object[] args) {
         try {
             java.util.Locale locale = LocaleContextHolder.getLocale();
-            if (args != null && args.length > 0) {
-                return messageSource.getMessage(messageKey, args, locale);
-            } else {
-                return messageSource.getMessage(messageKey, null, locale);
-            }
+            String message = messageSource.getMessage(messageKey, args, locale);
+            return message;
         } catch (Exception ex) {
+            ex.printStackTrace();
             log.warn("获取国际化消息失败: {}", messageKey);
             return messageKey;
         }

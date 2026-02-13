@@ -27,23 +27,8 @@ public class AppVersionController {
     @GetMapping("/get")
     public Result<RfAppVersion> getVersion() {
         // 查询所有版本，取最新的（假设按版本ID降序，第一个即为最新版本）
-        RfAppVersion query = new RfAppVersion();
-        List<RfAppVersion> versionList = rfAppVersionService.selectRfAppVersionList(query);
+        RfAppVersion version = rfAppVersionService.update();
 
-        // 获取最新版本（假设版本ID越大越新）
-        RfAppVersion latestVersion = null;
-        if (versionList != null && !versionList.isEmpty()) {
-            // 找到版本ID最大的记录
-            for (RfAppVersion version : versionList) {
-                if (latestVersion == null ||
-                    (version.getVersionId() != null &&
-                     latestVersion.getVersionId() != null &&
-                     version.getVersionId() > latestVersion.getVersionId())) {
-                    latestVersion = version;
-                }
-            }
-        }
-
-        return Result.success(latestVersion);
+        return Result.success(version);
     }
 }

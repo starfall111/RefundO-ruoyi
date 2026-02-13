@@ -58,4 +58,11 @@ public interface RfAppVersionMapper
      * @return 结果
      */
     public int deleteRfAppVersionByVersionIds(Long[] versionIds);
+
+    /**
+     * 获取最新版本信息
+     *
+     * @return
+     */
+    RfAppVersion update();
 }

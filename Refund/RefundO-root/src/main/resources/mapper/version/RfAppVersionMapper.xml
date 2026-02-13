@@ -83,4 +83,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             #{versionId}
         </foreach>
     </delete>
+
+    <select id="update" resultMap="RfAppVersionResult">
+        select * from rf_app_version order by version_id desc limit 1
+    </select>
 </mapper>

@@ -120,7 +120,7 @@ public class HeaderLocaleResolver implements LocaleResolver
             }
             else if (supportFrench && bestLanguage.contains("fr"))
             {
-                return Locale.FRANCE;
+                return Locale.FRENCH;
             }
         }
 

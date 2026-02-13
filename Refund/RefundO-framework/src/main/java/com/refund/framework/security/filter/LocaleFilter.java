@@ -33,14 +33,14 @@ public class LocaleFilter extends OncePerRequestFilter implements Ordered {
      */
     private static final Locale[] SUPPORTED_LOCALES = {
             Locale.SIMPLIFIED_CHINESE,  // zh-CN
-            Locale.US,                   // en-US
-            Locale.FRANCE                // fr-FR
+            Locale.ENGLISH,              // en
+            Locale.FRENCH                // fr
     };
 
     /**
-     * 默认语言: zh-CN
+     * 默认语言: en
      */
-    private static final Locale DEFAULT_LOCALE = Locale.SIMPLIFIED_CHINESE;
+    private static final Locale DEFAULT_LOCALE = Locale.ENGLISH;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -52,7 +52,9 @@ public class LocaleFilter extends OncePerRequestFilter implements Ordered {
 
             // 解析并设置语言环境
             Locale locale = fromString(acceptLanguage);
+            System.out.println("===== LocaleFilter: Accept-Language=" + acceptLanguage + ", resolved locale=" + locale);
             org.springframework.context.i18n.LocaleContextHolder.setLocale(locale);
+            System.out.println("===== LocaleFilter: LocaleContextHolder.getLocale()=" + org.springframework.context.i18n.LocaleContextHolder.getLocale());
 
             // 继续过滤器链
             filterChain.doFilter(request, response);
@@ -66,23 +68,29 @@ public class LocaleFilter extends OncePerRequestFilter implements Ordered {
      * 根据语言字符串获取 Locale 对象
      *
      * @param language 语言字符串 (如: zh-CN, en-US, fr-FR)
-     * @return Locale 对象
+     * @return Locale 对象（仅语言部分，不含国家代码，以匹配资源文件）
      */
     private Locale fromString(String language) {
         if (language == null || language.isEmpty()) {
             return DEFAULT_LOCALE;
         }
 
+        // 提取语言部分（split后第一个元素）
         String[] parts = language.split("[-_]");
-        if (parts.length == 1) {
-            Locale locale = new Locale(parts[0]);
-            return isSupported(locale) ? locale : DEFAULT_LOCALE;
-        } else if (parts.length >= 2) {
-            Locale locale = new Locale(parts[0], parts[1]);
-            return isSupported(locale) ? locale : DEFAULT_LOCALE;
-        }
+        String languageCode = parts[0].toLowerCase();
 
-        return DEFAULT_LOCALE;
+        // 根据语言代码返回对应的纯语言Locale（不带国家代码）
+        // 这样可以正确匹配资源文件：api-messages_zh.properties, api-messages_fr.properties
+        switch (languageCode) {
+            case "zh":
+                return Locale.SIMPLIFIED_CHINESE;
+            case "en":
+                return Locale.ENGLISH;
+            case "fr":
+                return Locale.FRENCH;
+            default:
+                return DEFAULT_LOCALE;
+        }
     }
 
     /**

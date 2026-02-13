@@ -8,7 +8,8 @@
       "Bash(mvn spring-boot:run:*)",
       "Bash(mvn clean package:*)",
       "Bash(java -jar:*)",
-      "WebSearch"
+      "WebSearch",
+      "Bash(claude --add-dir \"E:\\\\Android\\\\Project\\\\ReFundO001_star_zjx\")"
     ]
   }
 }

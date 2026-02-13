@@ -3,7 +3,9 @@ package com.refund.framework.config;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
+import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -21,25 +23,40 @@ public class ApiI18nConfig implements WebMvcConfigurer {
      */
     @Bean(name = "apiMessageSource")
     public MessageSource apiMessageSource() {
-        ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
-        // 设置国际化资源文件路径（支持多个文件）
-        messageSource.setBasename("classpath:i18n/api-messages");
-        // 设置缓存时间（秒），开发环境可以设置为0以便实时更新
-        messageSource.setCacheSeconds(3600);
+        ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
+        // 设置国际化资源文件路径（不使用 classpath: 前缀）
+        messageSource.setBasename("i18n.api-messages");
         // 设置编码
         messageSource.setDefaultEncoding("UTF-8");
         // 设置找不到key时返回key本身
         messageSource.setUseCodeAsDefaultMessage(true);
+        // 设置默认语言为英文
+        messageSource.setDefaultLocale(Locale.ENGLISH);
+        // 禁用回退到系统默认 Locale
+        messageSource.setFallbackToSystemLocale(false);
+
+        // 调试：打印加载的资源文件
+        System.out.println("===== ApiI18nConfig: apiMessageSource initialized");
+        System.out.println("===== ApiI18nConfig: basename=i18n.api-messages");
+        System.out.println("===== ApiI18nConfig: Testing fr locale...");
+        try {
+            String testMsg = messageSource.getMessage("error.account.not.found", null, Locale.FRENCH);
+            System.out.println("===== ApiI18nConfig: fr test result = " + testMsg);
+        } catch (Exception e) {
+            System.out.println("===== ApiI18nConfig: fr test failed: " + e.getMessage());
+        }
+
         return messageSource;
     }
 
     /**
      * APP端 LocaleResolver 配置
-     * 使用 HeaderLocaleResolver 并支持法语
+     * 禁用：由于 LocaleFilter 已经正确设置 Locale，避免重复解析导致冲突
      */
-    @Bean(name = "apiLocaleResolver")
-    public LocaleResolver apiLocaleResolver() {
-        HeaderLocaleResolver localeResolver = new HeaderLocaleResolver();
-        return localeResolver;
-    }
+    // @Bean(name = "apiLocaleResolver")
+    // @Primary
+    // public LocaleResolver apiLocaleResolver() {
+    //     HeaderLocaleResolver localeResolver = new HeaderLocaleResolver();
+    //     return localeResolver;
+    // }
 }

@@ -6,6 +6,7 @@ import com.refund.common.exception.business.MessageKeys;
 import com.refund.common.utils.ratelimit.RateLimitUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.MessageSource;
 import org.springframework.core.Ordered;
 import org.springframework.http.HttpStatus;
@@ -33,6 +34,7 @@ public class RateLimitFilter extends OncePerRequestFilter implements Ordered {
     private RateLimitUtil rateLimitUtil;
 
     @Autowired
+    @Qualifier("apiMessageSource")
     private MessageSource messageSource;
 
     @Autowired

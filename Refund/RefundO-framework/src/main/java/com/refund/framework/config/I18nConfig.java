@@ -16,7 +16,7 @@ import com.refund.common.constant.Constants;
 @Configuration
 public class I18nConfig implements WebMvcConfigurer
 {
-    @Bean
+    @Bean(name = "localeResolver")
     public LocaleResolver localeResolver()
     {
         HeaderLocaleResolver resolver = new HeaderLocaleResolver();

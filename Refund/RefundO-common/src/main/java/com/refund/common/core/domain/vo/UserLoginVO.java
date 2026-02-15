@@ -17,7 +17,7 @@ public class UserLoginVO implements Serializable {
     /**
      * 用户名
      */
-    private String userName;
+    private String username;
 
     /**
      * 账户余额
@@ -57,12 +57,12 @@ public class UserLoginVO implements Serializable {
         this.userId = userId;
     }
 
-    public String getUserName() {
-        return userName;
+    public String getUsername() {
+        return username;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public void setUsername(String userName) {
+        this.username = userName;
     }
 
     public BigDecimal getBalance() {

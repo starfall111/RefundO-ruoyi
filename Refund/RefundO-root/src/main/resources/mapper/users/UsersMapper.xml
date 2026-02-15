@@ -151,4 +151,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         SET balance = balance - #{amount}
         WHERE user_id = #{userId} AND balance >= #{amount}
     </update>
+
+    <select id="selectByEmail" resultMap="UsersResult">
+        select * from rf_users where email = #{email}
+    </select>
 </mapper>

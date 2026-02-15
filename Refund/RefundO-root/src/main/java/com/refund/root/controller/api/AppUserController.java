@@ -56,7 +56,7 @@ public class AppUserController {
         // 创建ApiLoginUser并生成token
         ApiLoginUser apiLoginUser = new ApiLoginUser();
         apiLoginUser.setUserId(userLoginVO.getUserId());
-        apiLoginUser.setUsername(userLoginVO.getUserName());
+        apiLoginUser.setUsername(userLoginVO.getUsername());
         apiLoginUser.setEmail(userLoginVO.getEmail());
 
         String token = apiTokenService.createToken(apiLoginUser);

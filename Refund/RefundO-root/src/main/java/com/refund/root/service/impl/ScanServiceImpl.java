@@ -105,7 +105,7 @@ public class ScanServiceImpl implements IScanService {
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public void addScanRecord(Product product, Long userId) {
+    public RfScanRecords addScanRecord(Product product, Long userId) {
         // 1. 序列化产品信息用于HMAC验证
         String message = serializeProduct(product);
 
@@ -147,6 +147,8 @@ public class ScanServiceImpl implements IScanService {
 
         log.info("扫描记录添加成功: userId={}, scanNumber={}, productId={}",
                 userId, scanNumber, product.getProductId());
+
+        return scan;
     }
 
     /**

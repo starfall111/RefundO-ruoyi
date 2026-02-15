@@ -115,4 +115,12 @@ public interface RfUsersMapper
      * @return 用户信息
      */
     RfUsers loginByNameOrEmail(@Param("userName") String userName, @Param("email") String email);
+
+    /**
+     * 根据邮箱查询用户信息
+     *
+     * @param email 邮箱
+     * @return 用户信息
+     */
+    RfUsers selectByEmail(String email);
 }

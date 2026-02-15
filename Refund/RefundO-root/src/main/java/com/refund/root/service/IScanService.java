@@ -4,6 +4,7 @@ import com.refund.common.core.page.PageResult;
 import com.refund.common.core.domain.dto.PageQueryDTO;
 import com.refund.common.core.domain.vo.ScanRecordsVO;
 import com.refund.root.domain.Product;
+import com.refund.root.domain.RfScanRecords;
 
 /**
  * APP端扫描服务接口
@@ -36,5 +37,5 @@ public interface IScanService {
      * @param product 产品信息（包含HMAC签名）
      * @param userId  当前用户ID
      */
-    void addScanRecord(Product product, Long userId);
+    RfScanRecords addScanRecord(Product product, Long userId);
 }

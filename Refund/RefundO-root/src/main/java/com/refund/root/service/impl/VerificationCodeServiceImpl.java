@@ -1,11 +1,10 @@
 package com.refund.root.service.impl;
 
-import com.refund.common.exception.business.BaseException;
-import com.refund.common.exception.business.CodeErrorException;
-import com.refund.common.exception.business.EamilSendErrorException;
-import com.refund.common.exception.business.MessageKeys;
+import com.refund.common.exception.business.*;
 import com.refund.common.service.IMailService;
 import com.refund.common.utils.VerificationCodeUtil;
+import com.refund.root.domain.RfUsers;
+import com.refund.root.mapper.RfUsersMapper;
 import com.refund.root.service.IVerificationCodeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +31,9 @@ public class VerificationCodeServiceImpl implements IVerificationCodeService {
     private IMailService mailService;
 
     @Autowired
+    private RfUsersMapper usersMapper;
+
+    @Autowired
     private RedisTemplate<Object, Object> redisTemplate;
 
     @Value("${verification.code.redis-prefix:email_code:}")
@@ -48,6 +50,12 @@ public class VerificationCodeServiceImpl implements IVerificationCodeService {
         String rateLimitKey = RATE_LIMIT_PREFIX + email;
         if (Boolean.TRUE.equals(redisTemplate.hasKey(rateLimitKey))) {
             throw new CodeErrorException(MessageKeys.CODE_SEND_TOO_FREQUENTLY);
+        }
+
+        //检查邮箱用户是否存在
+        RfUsers user = usersMapper.selectByEmail(email);
+        if (user != null) {
+            throw new AccountNotFoundException(MessageKeys.ACCOUNT_NOT_FOUND);
         }
 
         try {

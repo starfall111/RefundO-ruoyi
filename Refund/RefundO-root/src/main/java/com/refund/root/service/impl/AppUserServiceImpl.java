@@ -297,7 +297,7 @@ public class AppUserServiceImpl implements IAppUserService {
 
         UserLoginVO userLoginVO = new UserLoginVO();
         userLoginVO.setUserId(user.getUserId());
-        userLoginVO.setUserName(user.getUsername());
+        userLoginVO.setUsername(user.getUsername());
         userLoginVO.setEmail(user.getEmail());
         userLoginVO.setToken(token);
 

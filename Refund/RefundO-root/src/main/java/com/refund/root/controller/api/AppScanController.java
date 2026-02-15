@@ -8,6 +8,7 @@ import com.refund.common.core.domain.vo.ScanRecordsVO;
 import com.refund.common.enums.LimitType;
 import com.refund.common.utils.ApiSecurityUtils;
 import com.refund.root.domain.Product;
+import com.refund.root.domain.RfScanRecords;
 import com.refund.root.service.IScanService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -50,9 +51,9 @@ public class AppScanController {
      */
     @PostMapping("/insert")
     @RateLimit(time = 60, count = 10, limitType = LimitType.USER, key = "scan")
-    public Result<Void> addScanRecord(@RequestBody Product product) {
+    public Result addScanRecord(@RequestBody Product product) {
         Long userId = ApiSecurityUtils.getUserId();
-        scanService.addScanRecord(product, userId);
-        return Result.success();
+        RfScanRecords rfScanRecords = scanService.addScanRecord(product, userId);
+        return Result.success(rfScanRecords);
     }
 }
